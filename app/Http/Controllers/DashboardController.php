@@ -392,7 +392,14 @@ class DashboardController extends Controller
 
     private function studentDashboard()
     {
-        $student = Student::where('user_id', auth()->id())->firstOrFail();
+        $student = Student::where('user_id', auth()->id())->first();
+        
+        // If student record doesn't exist yet, show profile setup page
+        if (!$student) {
+            return view('dashboards.student-setup', [
+                'message' => 'Please complete your student profile to access the dashboard.'
+            ]);
+        }
 
         // Calculate GPA
         $grades = $student->grades()->with('course')->get();
@@ -497,6 +504,13 @@ class DashboardController extends Controller
             ->orWhere('parent_id', $user->id)
             ->with('user')
             ->get();
+
+        // If no students linked, show setup page
+        if ($students->isEmpty()) {
+            return view('dashboards.parent-setup', [
+                'message' => 'No students are currently linked to your parent account.'
+            ]);
+        }
 
         $stats = [
             'children_count' => $students->count(),

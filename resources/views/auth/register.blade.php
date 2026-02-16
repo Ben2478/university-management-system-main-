@@ -128,7 +128,7 @@
         <div class="register-header">
             <h1>🎓</h1>
             <h1>SMS</h1>
-            <p>Create Your Account</p>
+            <p>Create Your Test Account - All Roles Available</p>
         </div>
 
         <form method="POST" action="{{ route('register') }}" class="register-form">
@@ -173,9 +173,14 @@
                 <label for="role">Account Type</label>
                 <select id="role" name="role" required>
                     <option value="">-- Select Account Type --</option>
+                    <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin (Full Access)</option>
+                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin/Accountant (Financial Access)</option>
                     <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Student</option>
                     <option value="parent" {{ old('role') === 'parent' ? 'selected' : '' }}>Parent/Guardian</option>
                 </select>
+                <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                    ℹ️ For testing purposes - Choose your role to explore different features
+                </small>
             </div>
 
             <div class="form-row">
