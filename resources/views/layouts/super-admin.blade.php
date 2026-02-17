@@ -227,6 +227,7 @@
                     <span class="arrow">▼</span>
                 </div>
                 <div id="academic" class="sidebar-items">
+                    <a href="{{ route('programs.index') }}" style="padding-left: 3rem;">Programs</a>
                     <a href="{{ route('students.index') }}" style="padding-left: 3rem;">Students</a>
                     <a href="{{ route('courses.index') }}" style="padding-left: 3rem;">Courses</a>
                     <a href="{{ route('enrollments.index') }}" style="padding-left: 3rem;">Enrollments</a>

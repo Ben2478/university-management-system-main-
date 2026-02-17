@@ -194,6 +194,8 @@ class StudentController extends Controller
             'program' => 'required|string|max:255',
             'year' => 'required|integer|min:1|max:5',
             'semester' => 'required|integer|min:1|max:2',
+            'tuition_fee' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive,graduated,suspended',
         ]);
 
         // Generate random password for student

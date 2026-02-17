@@ -25,41 +25,28 @@
 
             <div class="form-group">
                 <label for="student_id">Student <span style="color: #e74c3c;">*</span></label>
-                <select id="student_id" name="student_id" required>
+                <select id="student_id" name="student_id" required onchange="updateStudentProgram()">
                     <option value="">-- Select Student --</option>
                     @foreach(\App\Models\Student::all() as $student)
-                        <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                            {{ $student->first_name }} {{ $student->last_name }} ({{ $student->student_id }})
+                        <option value="{{ $student->id }}" data-program="{{ $student->program }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
+                            {{ $student->first_name }} {{ $student->last_name }} ({{ $student->student_id }}) - {{ $student->program }}
                         </option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label for="program">Student's Program <span style="color: #e74c3c;">*</span></label>
+                <input type="text" id="program" name="program" readonly style="background: #f5f5f5;" value="{{ old('program') }}" required>
+                <small style="color: #666; font-size: 0.85rem;">Auto-filled based on selected student</small>
             </div>
 
             <div class="form-group">
                 <label for="course_id">Course <span style="color: #e74c3c;">*</span></label>
                 <select id="course_id" name="course_id" required>
-                    <option value="">-- Select Course --</option>
-                    @foreach(\App\Models\Course::all() as $course)
-                        <option value="{{ $course->id }}" {{ old('course_id') == $course->id ? 'selected' : '' }}>
-                            {{ $course->course_name }} ({{ $course->course_code }})
-                        </option>
-                    @endforeach
+                    <option value="">-- Select Student First --</option>
                 </select>
-            </div>
-
-            <div class="form-group">
-                <label for="program">Program of Study <span style="color: #e74c3c;">*</span></label>
-                <select id="program" name="program" required>
-                    <option value="">-- Select Program --</option>
-                    <option value="Computer Science" {{ old('program') == 'Computer Science' ? 'selected' : '' }}>Computer Science</option>
-                    <option value="Information Technology" {{ old('program') == 'Information Technology' ? 'selected' : '' }}>Information Technology</option>
-                    <option value="Software Engineering" {{ old('program') == 'Software Engineering' ? 'selected' : '' }}>Software Engineering</option>
-                    <option value="Data Science" {{ old('program') == 'Data Science' ? 'selected' : '' }}>Data Science</option>
-                    <option value="Cybersecurity" {{ old('program') == 'Cybersecurity' ? 'selected' : '' }}>Cybersecurity</option>
-                    <option value="Business Administration" {{ old('program') == 'Business Administration' ? 'selected' : '' }}>Business Administration</option>
-                    <option value="Engineering" {{ old('program') == 'Engineering' ? 'selected' : '' }}>Engineering</option>
-                    <option value="Medicine" {{ old('program') == 'Medicine' ? 'selected' : '' }}>Medicine</option>
-                </select>
+                <small style="color: #666; font-size: 0.85rem;">Only courses from the student's program will be shown</small>
             </div>
 
             <div class="form-group">
@@ -85,4 +72,50 @@
         </form>
     </div>
 </div>
+
+<script>
+    // Store all courses data
+    const allCourses = {!! json_encode(\App\Models\Course::where('status', 'active')->get(['id', 'course_name', 'course_code', 'department'])) !!};
+    
+    function updateStudentProgram() {
+        const studentSelect = document.getElementById('student_id');
+        const programInput = document.getElementById('program');
+        const courseSelect = document.getElementById('course_id');
+        
+        const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+        const studentProgram = selectedOption.getAttribute('data-program');
+        
+        if (studentProgram) {
+            programInput.value = studentProgram;
+            
+            // Filter and populate courses for this program
+            courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+            
+            const programCourses = allCourses.filter(course => course.department === studentProgram);
+            
+            if (programCourses.length === 0) {
+                courseSelect.innerHTML = '<option value="">No courses available for this program</option>';
+            } else {
+                programCourses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = `${course.course_name} (${course.course_code})`;
+                    courseSelect.appendChild(option);
+                });
+            }
+        } else {
+            programInput.value = '';
+            courseSelect.innerHTML = '<option value="">-- Select Student First --</option>';
+        }
+    }
+    
+    // Trigger on page load if there's an old value
+    window.addEventListener('DOMContentLoaded', function() {
+        const studentSelect = document.getElementById('student_id');
+        if (studentSelect.value) {
+            updateStudentProgram();
+        }
+    });
+</script>
+
 @endsection

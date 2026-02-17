@@ -193,6 +193,7 @@
             <a href="{{ route('receipts.index') }}">All Receipts</a>
 
             <h3>View Data</h3>
+            <a href="{{ route('programs.index') }}">Programs</a>
             <a href="{{ route('students.index') }}">Students</a>
             <a href="{{ route('payments.index') }}">Payments</a>
 

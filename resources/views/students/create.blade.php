@@ -180,8 +180,9 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="tel" id="phone" name="phone" value="{{ old('phone') }}">
+                        <label for="date_of_birth">Date of Birth *</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth" required value="{{ old('date_of_birth') }}">
+                        @error('date_of_birth') <span class="error">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
@@ -192,16 +193,11 @@
                             <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
                             <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
                         </select>
+                        @error('gender') <span class="error">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="date_of_birth">Date of Birth *</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" required value="{{ old('date_of_birth') }}">
-                        @error('date_of_birth') <span class="error">{{ $message }}</span> @enderror
-                    </div>
-
                     <div class="form-group">
                         <label for="enrollment_date">Enrollment Date *</label>
                         <input type="date" id="enrollment_date" name="enrollment_date" required value="{{ old('enrollment_date') }}">
@@ -247,6 +243,25 @@
                             <option value="2" {{ old('semester') == '2' ? 'selected' : '' }}>Semester 2</option>
                         </select>
                         @error('semester') <span class="error">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tuition_fee">Tuition Fee (K) *</label>
+                        <input type="number" id="tuition_fee" name="tuition_fee" step="0.01" min="0" required value="{{ old('tuition_fee', 5000.00) }}">
+                        @error('tuition_fee') <span class="error">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="graduated" {{ old('status') == 'graduated' ? 'selected' : '' }}>Graduated</option>
+                            <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
+                        </select>
+                        @error('status') <span class="error">{{ $message }}</span> @enderror
                     </div>
                 </div>
 

@@ -56,6 +56,13 @@ class CourseController extends Controller
     public function create()
     {
         $programs = $this->getPrograms();
+        
+        // Check if programs exist
+        if (empty($programs)) {
+            return redirect()->route('programs.index')
+                ->with('error', 'Please create at least one program before adding courses. Courses must belong to a program.');
+        }
+        
         return view('courses.create', compact('programs'));
     }
 

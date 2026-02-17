@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed programs first (required for courses and students)
+        $this->call(ProgramSeeder::class);
+        
         // User, Student, and Course seeding skipped (already exist)
         // Seed enrollments
         $this->call(EnrollmentSeeder::class);
