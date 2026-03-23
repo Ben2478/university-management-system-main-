@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class InitialUsersSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class InitialUsersSeeder extends Seeder
         $superAdminName = env('INITIAL_SUPERADMIN_NAME', 'Super Admin');
         $adminEmail = env('INITIAL_ADMIN_EMAIL', 'accountant@school.edu');
         $adminName = env('INITIAL_ADMIN_NAME', 'Accountant John');
+        $extraAdminEmails = env('INITIAL_EXTRA_ADMIN_EMAILS', '');
 
         User::updateOrCreate(
             ['email' => $superAdminEmail],
@@ -38,5 +40,33 @@ class InitialUsersSeeder extends Seeder
                 'must_change_password' => true,
             ]
         );
+
+        $emails = collect(preg_split('/\s*,\s*/', (string) $extraAdminEmails, -1, PREG_SPLIT_NO_EMPTY))
+            ->map(fn ($email) => trim($email))
+            ->filter()
+            ->unique()
+            ->values();
+
+        foreach ($emails as $email) {
+            if (Str::lower($email) === Str::lower($superAdminEmail) || Str::lower($email) === Str::lower($adminEmail)) {
+                continue;
+            }
+
+            $localPart = Str::before($email, '@');
+            $nameGuess = Str::of($localPart)
+                ->replace(['.', '_', '-'], ' ')
+                ->trim()
+                ->title();
+
+            User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => (string) $nameGuess,
+                    'password' => Hash::make('welcome123'),
+                    'role' => 'admin',
+                    'must_change_password' => true,
+                ]
+            );
+        }
     }
 }

@@ -43,6 +43,7 @@ INITIAL_SUPERADMIN_EMAIL=superadmin@yourdomain.com
 INITIAL_SUPERADMIN_NAME=Super Admin
 INITIAL_ADMIN_EMAIL=admin@yourdomain.com
 INITIAL_ADMIN_NAME=System Admin
+INITIAL_EXTRA_ADMIN_EMAILS=staff1@yourdomain.com,staff2@yourdomain.com
 ```
 
 ```bash
