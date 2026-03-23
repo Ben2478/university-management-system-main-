@@ -16,6 +16,7 @@ class InitialUsersSeeder extends Seeder
         $adminEmail = env('INITIAL_ADMIN_EMAIL', 'accountant@school.edu');
         $adminName = env('INITIAL_ADMIN_NAME', 'Accountant John');
         $extraAdminEmails = env('INITIAL_EXTRA_ADMIN_EMAILS', '');
+        $disableLegacySeedUsers = filter_var(env('INITIAL_DISABLE_LEGACY_SEED_USERS', 'false'), FILTER_VALIDATE_BOOL);
 
         User::updateOrCreate(
             ['email' => $superAdminEmail],
@@ -67,6 +68,23 @@ class InitialUsersSeeder extends Seeder
                     'must_change_password' => true,
                 ]
             );
+        }
+
+        if ($disableLegacySeedUsers) {
+            $legacyEmails = [
+                'superadmin@school.edu',
+                'accountant@school.edu',
+            ];
+
+            foreach ($legacyEmails as $legacyEmail) {
+                if (Str::lower($legacyEmail) === Str::lower($superAdminEmail) || Str::lower($legacyEmail) === Str::lower($adminEmail)) {
+                    continue;
+                }
+
+                User::where('email', $legacyEmail)
+                    ->whereNull('deleted_at')
+                    ->update(['deleted_at' => now()]);
+            }
         }
     }
 }
