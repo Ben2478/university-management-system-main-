@@ -36,6 +36,15 @@ php artisan migrate --force
 
 4) Seed **only the users table** (optional, recommended so you can log in):
 
+Before seeding, you can set these env vars on Laravel Cloud to use your real domain emails/names:
+
+```env
+INITIAL_SUPERADMIN_EMAIL=superadmin@yourdomain.com
+INITIAL_SUPERADMIN_NAME=Super Admin
+INITIAL_ADMIN_EMAIL=admin@yourdomain.com
+INITIAL_ADMIN_NAME=System Admin
+```
+
 ```bash
 php artisan db:seed --class=Database\\Seeders\\InitialUsersSeeder --force
 ```

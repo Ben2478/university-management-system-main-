@@ -10,10 +10,15 @@ class InitialUsersSeeder extends Seeder
 {
     public function run(): void
     {
+        $superAdminEmail = env('INITIAL_SUPERADMIN_EMAIL', 'superadmin@school.edu');
+        $superAdminName = env('INITIAL_SUPERADMIN_NAME', 'Super Admin');
+        $adminEmail = env('INITIAL_ADMIN_EMAIL', 'accountant@school.edu');
+        $adminName = env('INITIAL_ADMIN_NAME', 'Accountant John');
+
         User::updateOrCreate(
-            ['email' => 'superadmin@school.edu'],
+            ['email' => $superAdminEmail],
             [
-                'name' => 'Super Admin',
+                'name' => $superAdminName,
                 'password' => Hash::make('welcome123'),
                 'role' => 'super_admin',
                 'phone' => '+260123456789',
@@ -23,9 +28,9 @@ class InitialUsersSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'accountant@school.edu'],
+            ['email' => $adminEmail],
             [
-                'name' => 'Accountant John',
+                'name' => $adminName,
                 'password' => Hash::make('welcome123'),
                 'role' => 'admin',
                 'phone' => '+260123456790',
