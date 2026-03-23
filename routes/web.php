@@ -23,9 +23,9 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 // Temporary public bootstrap registration (use an access code; disable later)
 Route::get('/register', [AdminRegisterController::class, 'create'])
     ->name('register')
-    ->middleware('guest');
+    ->middleware(['guest', 'throttle:30,1']);
 Route::post('/register', [AdminRegisterController::class, 'store'])
-    ->middleware('guest');
+    ->middleware(['guest', 'throttle:30,1']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Force password change for first-time logins
