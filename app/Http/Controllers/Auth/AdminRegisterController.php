@@ -18,18 +18,35 @@ class AdminRegisterController extends Controller
 
     public function store(Request $request)
     {
+        // Toggle + shared access code to avoid open registration in production
+        if (!filter_var(env('PUBLIC_ADMIN_REGISTER_ENABLED', false), FILTER_VALIDATE_BOOLEAN)) {
+            abort(404);
+        }
+
+        $expectedCode = (string) env('PUBLIC_ADMIN_REGISTER_CODE', '');
+        if ($expectedCode === '') {
+            abort(500, 'Registration access code is not configured.');
+        }
+
         $validated = $request->validate([
+            'access_code' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', 'in:super_admin,admin'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:255'],
         ]);
 
+        if (!hash_equals($expectedCode, (string) $validated['access_code'])) {
+            return back()->withErrors([
+                'access_code' => 'Invalid access code.',
+            ])->withInput($request->except(['access_code']));
+        }
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role' => $validated['role'],
+            // Keep this limited. Promote to super_admin via DB or admin tooling after first login.
+            'role' => 'admin',
             'phone' => $validated['phone'] ?? null,
             'address' => $validated['address'] ?? null,
             'password' => Hash::make(self::DEFAULT_PASSWORD),

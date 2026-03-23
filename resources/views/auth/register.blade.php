@@ -90,6 +90,10 @@
                 Default password for new users is <code>welcome123</code>. They will be forced to change it at first login.
             </div>
 
+            <div class="note">
+                <strong>Temporary access:</strong> This page requires an access code. Ask the system owner for the code.
+            </div>
+
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
@@ -114,6 +118,12 @@
                 @csrf
 
                 <div class="form-group">
+                    <label for="access_code">Access Code</label>
+                    <input id="access_code" name="access_code" type="password" required>
+                    <div class="small">This will be disabled later.</div>
+                </div>
+
+                <div class="form-group">
                     <label for="name">Full Name</label>
                     <input id="name" name="name" type="text" value="{{ old('name') }}" required>
                 </div>
@@ -125,13 +135,9 @@
 
                 <div class="row">
                     <div class="form-group">
-                        <label for="role">Role</label>
-                        <select id="role" name="role" required>
-                            <option value="">Select role</option>
-                            <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                        </select>
-                        <div class="small">For students/lecturers, use their dedicated modules.</div>
+                        <label>Role</label>
+                        <input type="text" value="Admin" disabled>
+                        <div class="small">This page only creates Admin accounts.</div>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone (optional)</label>

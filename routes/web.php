@@ -20,12 +20,12 @@ use App\Http\Controllers\Auth\AdminRegisterController;
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-// Admin-only registration (temporary): creates staff accounts with default password
+// Temporary public bootstrap registration (use an access code; disable later)
 Route::get('/register', [AdminRegisterController::class, 'create'])
     ->name('register')
-    ->middleware(['auth', 'role:super_admin,admin']);
+    ->middleware('guest');
 Route::post('/register', [AdminRegisterController::class, 'store'])
-    ->middleware(['auth', 'role:super_admin,admin']);
+    ->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Force password change for first-time logins
