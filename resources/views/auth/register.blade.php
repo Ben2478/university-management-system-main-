@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Disabled</title>
+    <title>Create User - Phoenix Open University</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -56,28 +56,98 @@
         }
         .small { margin-top: .75rem; color: #666; font-size: .9rem; text-align: center; }
         code { background: #f6f7ff; padding: .15rem .35rem; border-radius: 4px; }
+        .form-group { margin-top: 1rem; }
+        label { display:block; margin-bottom: .4rem; font-weight: 700; color:#333; }
+        input, select, textarea {
+            width: 100%;
+            padding: .75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .row { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+        .alert {
+            padding: .85rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: .95rem;
+        }
+        .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+        .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="header">
-            <h1>Registration Disabled</h1>
-            <p>Accounts are created by the administration.</p>
+            <h1>Create User (Admin Only)</h1>
+            <p>Phoenix Open University</p>
         </div>
 
         <div class="body">
             <div class="note">
-                If you need an account, please contact the school administration.
+                Default password for new users is <code>welcome123</code>. They will be forced to change it at first login.
             </div>
 
-            <ul class="list">
-                <li><strong>Students</strong> log in using their <strong>Student ID</strong>.</li>
-                <li><strong>Lecturers / Admin / Management</strong> log in using <strong>Email</strong>.</li>
-                <li>Default first-time password is <code>welcome123</code> and you’ll be required to change it after login.</li>
-            </ul>
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
 
-            <a class="btn" href="{{ route('login') }}">Go to Login</a>
-            <div class="small">If you already have credentials, you can sign in now.</div>
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+
+            @if(session('created_user'))
+                <div class="alert alert-success">
+                    <div><strong>Created:</strong> {{ session('created_user.name') }} ({{ session('created_user.role') }})</div>
+                    <div><strong>Email:</strong> {{ session('created_user.email') }}</div>
+                    <div><strong>Temporary Password:</strong> <code>{{ session('created_user.password') }}</code></div>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" required>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" name="role" required>
+                            <option value="">Select role</option>
+                            <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
+                        </select>
+                        <div class="small">For students/lecturers, use their dedicated modules.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone (optional)</label>
+                        <input id="phone" name="phone" type="text" value="{{ old('phone') }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address (optional)</label>
+                    <textarea id="address" name="address" rows="2">{{ old('address') }}</textarea>
+                </div>
+
+                <button type="submit" class="btn">Create User</button>
+            </form>
+
+            <a class="btn" style="margin-top: .75rem; background: #6c757d;" href="{{ route('dashboard') }}">Back to Dashboard</a>
         </div>
     </div>
 </body>

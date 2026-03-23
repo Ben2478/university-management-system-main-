@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class AdminRegisterController extends Controller
+{
+    private const DEFAULT_PASSWORD = 'welcome123';
+
+    public function create()
+    {
+        return view('auth.register');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['required', 'in:super_admin,admin'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'address' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'password' => Hash::make(self::DEFAULT_PASSWORD),
+            'must_change_password' => true,
+        ]);
+
+        return redirect()->route('register')->with([
+            'success' => 'User created successfully.',
+            'created_user' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'password' => self::DEFAULT_PASSWORD,
+            ],
+        ]);
+    }
+}

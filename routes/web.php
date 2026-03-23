@@ -15,15 +15,17 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\Auth\PasswordChangeController;
+use App\Http\Controllers\Auth\AdminRegisterController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-// Registration disabled for go-live (accounts are created by administration)
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
-Route::post('/register', function () {
-    abort(404);
-})->middleware('guest');
+// Admin-only registration (temporary): creates staff accounts with default password
+Route::get('/register', [AdminRegisterController::class, 'create'])
+    ->name('register')
+    ->middleware(['auth', 'role:super_admin,admin']);
+Route::post('/register', [AdminRegisterController::class, 'store'])
+    ->middleware(['auth', 'role:super_admin,admin']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Force password change for first-time logins
