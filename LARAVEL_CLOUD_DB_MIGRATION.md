@@ -34,11 +34,14 @@ DB_PASSWORD=YOUR_CLOUD_DB_PASSWORD
 php artisan migrate --force
 ```
 
-4) If you use seeders (optional):
+4) Seed **only the users table** (optional, recommended so you can log in):
 
 ```bash
-php artisan db:seed --force
+php artisan db:seed --class=Database\\Seeders\\InitialUsersSeeder --force
 ```
+
+Important:
+- If you run `php artisan db:seed --force` without `--class`, it will execute your default `DatabaseSeeder` which may seed **other tables**.
 
 Notes:
 - This is the cleanest approach if you **don’t need local data**.
