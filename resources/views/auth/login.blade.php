@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Student Management System</title>
+    <title>Login - Phoenix Open University</title>
     <style>
         * {
             margin: 0;
@@ -31,6 +31,18 @@
             color: white;
             padding: 2rem;
             text-align: center;
+        }
+        .login-logo {
+            width: 72px;
+            height: 72px;
+            display: inline-block;
+            margin-bottom: .75rem;
+        }
+        .login-logo img {
+            width: 72px;
+            height: 72px;
+            display: block;
+            margin: 0 auto;
         }
         .login-header h1 {
             font-size: 2rem;
@@ -157,9 +169,11 @@
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>🎓</h1>
-            <h1>SMS</h1>
-            <p>Student Management System</p>
+            <div class="login-logo">
+                <img src="{{ asset('images/phoenix-open-university.jpeg') }}" alt="Phoenix Open University" />
+            </div>
+            <h1>Phoenix Open University</h1>
+            <p>University Management System</p>
         </div>
 
         <form method="POST" action="{{ route('login') }}" class="login-form">
@@ -174,15 +188,15 @@
             @endif
 
             <div class="form-group">
-                <label for="email">Email Address</label>
+                <label for="identifier">Student ID or Email</label>
                 <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    value="{{ old('email') }}" 
+                    type="text" 
+                    id="identifier" 
+                    name="identifier" 
+                    value="{{ old('identifier') }}" 
                     required 
                     autofocus
-                    placeholder="Enter your email"
+                    placeholder="e.g., 202501123 or staff@school.edu"
                 >
             </div>
 
@@ -206,24 +220,6 @@
 
             <button type="submit" class="btn-login">Login</button>
 
-            <div class="signup-link">
-                Don't have an account? <a href="{{ route('register') }}">Sign up</a>
-            </div>
-
-            <div class="demo-credentials">
-                <h4>📌 Demo Credentials:</h4>
-                <p><strong>Super Admin:</strong></p>
-                <p>Email: <code>superadmin@school.edu</code></p>
-                <p>Password: <code>password123</code></p>
-                
-                <p style="margin-top: 0.5rem;"><strong>Student:</strong></p>
-                <p>Email: <code>student1@school.edu</code></p>
-                <p>Password: <code>password123</code></p>
-
-                <p style="margin-top: 0.5rem;"><strong>Accountant:</strong></p>
-                <p>Email: <code>accountant@school.edu</code></p>
-                <p>Password: <code>password123</code></p>
-            </div>
         </form>
     </div>
 </body>

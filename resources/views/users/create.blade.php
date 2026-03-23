@@ -54,24 +54,15 @@
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
                         <option value="parent" {{ old('role') == 'parent' ? 'selected' : '' }}>Parent</option>
+                        <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>Lecturer</option>
                     </select>
                 </div>
 
-                <!-- Password -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
-                    <input type="password" name="password" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                           minlength="8">
-                    <p class="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
-                </div>
-
-                <!-- Password Confirmation -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
-                    <input type="password" name="password_confirmation" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                           minlength="8">
+                <div class="md:col-span-2">
+                    <div class="p-4 rounded bg-yellow-50 border border-yellow-200 text-yellow-900">
+                        <strong>Default password:</strong> <span class="font-mono">welcome123</span>
+                        <div class="text-sm mt-1">The user will be forced to change it at first login.</div>
+                    </div>
                 </div>
 
                 <!-- Address -->

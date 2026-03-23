@@ -33,7 +33,10 @@ class ProfileController extends Controller
         ]);
 
         if (!empty($validated['password'])) {
-            $user->update(['password' => Hash::make($validated['password'])]);
+            $user->update([
+                'password' => Hash::make($validated['password']),
+                'must_change_password' => false,
+            ]);
         }
 
         return back()->with('success', 'Profile updated successfully.');

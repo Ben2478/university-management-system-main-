@@ -229,8 +229,8 @@ class StudentController extends Controller
         unset($validated['school_code']);
         $validated['student_id'] = $studentId;
 
-        // Generate random password for student
-        $password = Str::random(8);
+        // Default password policy
+        $password = 'welcome123';
 
         // Create user account for the student
         $user = User::create([
@@ -239,6 +239,7 @@ class StudentController extends Controller
             'password' => Hash::make($password),
             'role' => 'student',
             'phone' => $validated['phone'] ?? null,
+            'must_change_password' => true,
         ]);
 
         // Create student record linked to user

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class LecturerController extends Controller
 {
+    private const DEFAULT_PASSWORD = 'welcome123';
+
     public function index()
     {
         $lecturers = Lecturer::withCount('courses')
@@ -48,7 +50,7 @@ class LecturerController extends Controller
         ]);
 
         return DB::transaction(function () use ($validated) {
-            $password = Str::random(10);
+            $password = self::DEFAULT_PASSWORD;
 
             $user = User::create([
                 'name' => $validated['first_name'] . ' ' . $validated['last_name'],
@@ -56,6 +58,7 @@ class LecturerController extends Controller
                 'password' => Hash::make($password),
                 'role' => 'lecturer',
                 'phone' => $validated['phone'] ?? null,
+                'must_change_password' => true,
             ]);
 
             $year = date('Y');

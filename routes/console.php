@@ -13,7 +13,7 @@ Artisan::command('inspire', function () {
 
 Artisan::command('make:test-lecturer {email? : Email for the lecturer account} {--password= : Optional plaintext password} {--force : Update existing user to lecturer if needed}', function () {
     $email = $this->argument('email') ?: 'lecturer@test.com';
-    $plainPassword = $this->option('password') ?: Str::random(10);
+    $plainPassword = $this->option('password') ?: 'welcome123';
     $force = (bool) $this->option('force');
 
     $existingUser = User::where('email', $email)->first();
@@ -28,6 +28,7 @@ Artisan::command('make:test-lecturer {email? : Email for the lecturer account} {
         'password' => Hash::make($plainPassword),
         'role' => 'lecturer',
         'phone' => null,
+        'must_change_password' => true,
     ]);
 
     if ($existingUser) {
@@ -35,6 +36,7 @@ Artisan::command('make:test-lecturer {email? : Email for the lecturer account} {
             'role' => 'lecturer',
             // If caller passed a password, reset it.
             'password' => $this->option('password') ? Hash::make($plainPassword) : $user->password,
+            'must_change_password' => true,
         ]);
     }
 

@@ -19,20 +19,22 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@school.edu',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('welcome123'),
             'role' => 'super_admin',
             'phone' => '+260123456789',
-            'address' => '123 Admin Street'
+            'address' => '123 Admin Street',
+            'must_change_password' => true,
         ]);
 
         // Create Admin (Accountant)
         User::create([
             'name' => 'Accountant John',
             'email' => 'accountant@school.edu',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('welcome123'),
             'role' => 'admin',
             'phone' => '+260123456790',
-            'address' => '456 Finance Avenue'
+            'address' => '456 Finance Avenue',
+            'must_change_password' => true,
         ]);
 
         // Create Student Users
@@ -40,10 +42,11 @@ class UserSeeder extends Seeder
             $user = User::create([
                 'name' => "Student {$i}",
                 'email' => "student{$i}@school.edu",
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('welcome123'),
                 'role' => 'student',
                 'phone' => '+2601234567' . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'address' => "{$i}00 Student Street"
+                'address' => "{$i}00 Student Street",
+                'must_change_password' => true,
             ]);
             
             // Create corresponding Student record
@@ -69,10 +72,11 @@ class UserSeeder extends Seeder
             User::create([
                 'name' => "Parent {$i}",
                 'email' => "parent{$i}@school.edu",
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('welcome123'),
                 'role' => 'parent',
                 'phone' => '+2601234567' . str_pad($i + 10, 2, '0', STR_PAD_LEFT),
-                'address' => "{$i}00 Parent Street"
+                'address' => "{$i}00 Parent Street",
+                'must_change_password' => true,
             ]);
         }
     }

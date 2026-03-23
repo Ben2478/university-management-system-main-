@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    private const DEFAULT_PASSWORD = 'welcome123';
+
     // Show login form
     public function showLogin()
     {
@@ -20,19 +22,50 @@ class AuthController extends Controller
     // Handle login
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+        $validated = $request->validate([
+            'identifier' => ['required', 'string'],
+            'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $identifier = trim($validated['identifier']);
+        $remember = $request->boolean('remember');
+
+        $credentials = null;
+
+        // Staff/management/lecturers login via email
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $credentials = [
+                'email' => $identifier,
+                'password' => $validated['password'],
+            ];
+        } else {
+            // Students login via Student ID
+            $student = Student::where('student_id', $identifier)->with('user')->first();
+            if (!$student || !$student->user || !$student->user->isStudent()) {
+                return back()->withErrors([
+                    'identifier' => 'Invalid Student ID or password.',
+                ])->onlyInput('identifier');
+            }
+
+            $credentials = [
+                'email' => $student->user->email,
+                'password' => $validated['password'],
+            ];
+        }
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            if (auth()->user()?->must_change_password) {
+                return redirect()->route('password.change')->with('error', 'Please change your password to continue.');
+            }
+
             return redirect()->intended('/');
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+            'identifier' => 'The provided credentials do not match our records.',
+        ])->onlyInput('identifier');
     }
 
     // Show register form
@@ -48,7 +81,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'in:super_admin,admin,student,parent'],
+            'role' => ['required', 'in:super_admin,admin,student,parent,lecturer'],
             'phone' => ['nullable', 'string'],
         ]);
 
@@ -77,6 +110,7 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'phone' => $validated['phone'] ?? null,
+            'must_change_password' => true,
         ]);
 
         // Auto-create Student record if registering as student (for testing)

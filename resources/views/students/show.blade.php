@@ -25,9 +25,9 @@
         <p style="margin-bottom: 1rem;"><strong>Login credentials have been generated. Please save these details and share them with the student:</strong></p>
         
         <div style="background: white; padding: 1rem; border-radius: 5px; border: 1px solid #c3e6cb;">
-            <p style="margin: 0.5rem 0;"><strong>Email/Username:</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['email'] }}</code></p>
-            <p style="margin: 0.5rem 0;"><strong>Student ID:</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['student_id'] }}</code></p>
-            <p style="margin: 0.5rem 0;"><strong>Temporary Password:</strong> <code style="background: #fff3cd; padding: 0.25rem 0.5rem; border-radius: 3px; color: #856404;">{{ session('login_credentials')['password'] }}</code></p>
+            <p style="margin: 0.5rem 0;"><strong>Student ID (Login):</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['student_id'] }}</code></p>
+            <p style="margin: 0.5rem 0;"><strong>Default Password:</strong> <code style="background: #fff3cd; padding: 0.25rem 0.5rem; border-radius: 3px; color: #856404;">{{ session('login_credentials')['password'] }}</code></p>
+            <p style="margin: 0.5rem 0;"><strong>Email (for records):</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['email'] }}</code></p>
         </div>
         
         <p style="margin-top: 1rem; margin-bottom: 0; font-size: 0.9rem;">

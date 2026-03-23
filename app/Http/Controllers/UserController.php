@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    private const DEFAULT_PASSWORD = 'welcome123';
+
     /**
      * Display a listing of users
      */
@@ -53,6 +55,7 @@ class UserController extends Controller
             'admins' => User::where('role', 'admin')->count(),
             'students' => User::where('role', 'student')->count(),
             'parents' => User::where('role', 'parent')->count(),
+            'lecturers' => User::where('role', 'lecturer')->count(),
             'inactive' => User::onlyTrashed()->count(),
         ];
 
@@ -77,17 +80,17 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:super_admin,admin,student,parent',
+            'role' => 'required|in:super_admin,admin,student,parent,lecturer',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        $validated['password'] = Hash::make(self::DEFAULT_PASSWORD);
+        $validated['must_change_password'] = true;
 
         User::create($validated);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('users.index')->with('success', 'User created successfully. Default password is welcome123 (user will be forced to change it at first login).');
     }
 
     /**
@@ -123,7 +126,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:super_admin,admin,student,parent',
+            'role' => 'required|in:super_admin,admin,student,parent,lecturer',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
@@ -176,7 +179,8 @@ class UserController extends Controller
         ]);
 
         $user->update([
-            'password' => Hash::make($validated['new_password'])
+            'password' => Hash::make($validated['new_password']),
+            'must_change_password' => true,
         ]);
 
         return back()->with('success', 'Password reset successfully.');

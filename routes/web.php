@@ -14,13 +14,25 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\Auth\PasswordChangeController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+// Registration disabled for go-live (accounts are created by administration)
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
-Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
+Route::post('/register', function () {
+    abort(404);
+})->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Force password change for first-time logins
+Route::get('/password/change', [PasswordChangeController::class, 'edit'])
+    ->name('password.change')
+    ->middleware('auth');
+Route::post('/password/change', [PasswordChangeController::class, 'update'])
+    ->name('password.change.update')
+    ->middleware('auth');
 
 // Root route with authentication
 Route::get('/', [DashboardController::class, 'index'])
@@ -28,7 +40,7 @@ Route::get('/', [DashboardController::class, 'index'])
     ->middleware(['auth']);
 
 // Redirect login to dashboard if already authenticated
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
     
     // Profile Routes
