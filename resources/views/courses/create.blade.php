@@ -80,6 +80,19 @@
                 <input type="text" id="instructor" name="instructor" placeholder="e.g., Dr. John Smith" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" value="{{ old('instructor') }}">
             </div>
 
+            <!-- Lecturers (Multi) -->
+            <div style="grid-column: span 2;">
+                <label for="lecturer_ids" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Assign Lecturers</label>
+                <select id="lecturer_ids" name="lecturer_ids[]" multiple style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; background: white; min-height: 120px;">
+                    @foreach(($lecturers ?? []) as $lecturer)
+                        <option value="{{ $lecturer->id }}" {{ collect(old('lecturer_ids', []))->contains($lecturer->id) ? 'selected' : '' }}>
+                            {{ $lecturer->full_name }} ({{ $lecturer->lecturer_code }})
+                        </option>
+                    @endforeach
+                </select>
+                <small style="color: #666; font-size: 0.875rem;">Hold Ctrl (Windows) / Cmd (Mac) to select multiple lecturers</small>
+            </div>
+
             <!-- Tuition Fee -->
             <div>
                 <label for="tuition_fee" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Course Fee (K)</label>

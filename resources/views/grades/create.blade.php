@@ -1,4 +1,4 @@
-@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
+@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
 <div class="container" style="max-width: 600px; margin: 30px auto;">
@@ -21,7 +21,7 @@
             <label for="student_id" style="display: block; margin-bottom: 8px; font-weight: bold;">Student:</label>
             <select id="student_id" name="student_id" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                 <option value="">Select Student</option>
-                @foreach(\App\Models\Student::all() as $student)
+                @foreach(($students ?? \App\Models\Student::all()) as $student)
                     <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
                         {{ $student->first_name }} {{ $student->last_name }} ({{ $student->student_id }})
                     </option>
@@ -34,7 +34,7 @@
             <select id="course_id" name="course_id" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                 <option value="">Select Course</option>
                 @php
-                    $coursesByDept = \App\Models\Course::all()->groupBy('department');
+                    $coursesByDept = ($courses ?? \App\Models\Course::all())->groupBy('department');
                 @endphp
                 @foreach($coursesByDept as $department => $courses)
                     <optgroup label="{{ $department ?? 'Other Courses' }}">

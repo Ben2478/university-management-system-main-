@@ -24,9 +24,33 @@ class DashboardController extends Controller
             return $this->studentDashboard();
         } elseif ($user->isParent()) {
             return $this->parentDashboard();
+        } elseif (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            return $this->lecturerDashboard();
         }
 
         return redirect('login');
+    }
+
+    private function lecturerDashboard()
+    {
+        $lecturer = auth()->user()->lecturer;
+        if (!$lecturer) {
+            return redirect('login');
+        }
+
+        $courses = $lecturer->courses()
+            ->withCount(['enrollments' => function ($q) {
+                $q->where('status', 'active');
+            }])
+            ->orderBy('course_name')
+            ->get();
+
+        $stats = [
+            'courses_count' => $courses->count(),
+            'active_enrollments' => $courses->sum('enrollments_count'),
+        ];
+
+        return view('dashboards.lecturer', compact('lecturer', 'courses', 'stats'));
     }
 
     private function superAdminDashboard()

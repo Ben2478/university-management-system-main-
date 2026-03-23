@@ -99,7 +99,12 @@
                     </td>
                     <td style="padding: 1rem;">
                         <div style="font-weight: 500; color: #2c3e50;">{{ $course->course_name }}</div>
-                        @if($course->instructor)
+                        @php
+                            $lecturerNames = $course->lecturers?->pluck('full_name')->filter()->values() ?? collect();
+                        @endphp
+                        @if($lecturerNames->count() > 0)
+                            <small style="color: #7f8c8d;">👨‍🏫 {{ $lecturerNames->take(2)->join(', ') }}@if($lecturerNames->count() > 2) +{{ $lecturerNames->count() - 2 }} more @endif</small>
+                        @elseif($course->instructor)
                             <small style="color: #7f8c8d;">👤 {{ $course->instructor }}</small>
                         @endif
                     </td>
@@ -116,7 +121,7 @@
                     </td>
                     <td style="padding: 1rem; text-align: center;">
                         <span style="padding: 0.25rem 0.75rem; background: #fff3e0; color: #e65100; border-radius: 0.25rem; font-weight: 600;">
-                            {{ $course->enrollments->count() }}
+                            {{ $course->enrollments_count ?? 0 }}
                         </span>
                     </td>
                     <td style="padding: 1rem; text-align: center;">

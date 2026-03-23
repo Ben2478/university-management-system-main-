@@ -52,6 +52,25 @@ class AuthController extends Controller
             'phone' => ['nullable', 'string'],
         ]);
 
+        // Extra fields for student registration
+        if ($validated['role'] === 'student') {
+            $allowedSchoolCodes = array_keys(config('schools.labels', []));
+
+            $studentExtra = $request->validate([
+                'school_code' => ['required', 'string', 'in:' . implode(',', $allowedSchoolCodes)],
+                'nrc' => ['required', 'string', 'max:50', function ($attribute, $value, $fail) {
+                    $beforeSlash = explode('/', (string) $value, 2)[0] ?? '';
+                    $digits = preg_replace('/\D+/', '', (string) $beforeSlash);
+                    if (strlen($digits) < 3) {
+                        $fail('The NRC must contain at least 3 digits before the first "/".');
+                    }
+                }],
+                'enrollment_date' => ['required', 'date'],
+            ]);
+
+            $validated = array_merge($validated, $studentExtra);
+        }
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -65,9 +84,24 @@ class AuthController extends Controller
             $nameParts = explode(' ', $validated['name'], 2);
             $firstName = $nameParts[0] ?? 'Student';
             $lastName = $nameParts[1] ?? 'User';
-            
-            // Generate unique student ID
-            $studentId = 'STU' . date('Y') . str_pad(Student::count() + 1, 4, '0', STR_PAD_LEFT);
+
+            // Generate student ID: YYYY + school_code + last3digits(NRC before first '/')
+            $year = (string) date('Y', strtotime($validated['enrollment_date']));
+            $beforeSlash = explode('/', (string) $validated['nrc'], 2)[0] ?? '';
+            $digits = preg_replace('/\D+/', '', (string) $beforeSlash);
+            $last3 = substr($digits, -3);
+            $baseStudentId = $year . $validated['school_code'] . $last3;
+
+            $studentId = $baseStudentId;
+            if (Student::where('student_id', $studentId)->exists()) {
+                for ($i = 1; $i <= 99; $i++) {
+                    $candidate = $baseStudentId . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+                    if (!Student::where('student_id', $candidate)->exists()) {
+                        $studentId = $candidate;
+                        break;
+                    }
+                }
+            }
             
             Student::create([
                 'user_id' => $user->id,
@@ -75,6 +109,7 @@ class AuthController extends Controller
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $validated['email'],
+                'nrc' => $validated['nrc'],
                 'phone' => $validated['phone'] ?? null,
                 'date_of_birth' => now()->subYears(20), // Default age
                 'gender' => 'other',
@@ -82,7 +117,7 @@ class AuthController extends Controller
                 'city' => 'N/A',
                 'state' => 'N/A',
                 'postal_code' => '00000',
-                'enrollment_date' => now(),
+                'enrollment_date' => $validated['enrollment_date'],
                 'program' => 'General',
                 'status' => 'active',
                 'year' => 1,

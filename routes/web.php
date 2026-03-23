@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\LecturerController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -43,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::get('programs/{program}/add-courses', [ProgramController::class, 'addCourses'])->name('programs.add-courses');
     Route::post('programs/{program}/store-courses', [ProgramController::class, 'storeCourses'])->name('programs.store-courses');
     Route::resource('programs', ProgramController::class);
+
+    // Lecturer Routes (Super Admin & Admin)
+    Route::resource('lecturers', LecturerController::class)->middleware('role:super_admin,admin');
 
     // Course Routes
     Route::resource('courses', CourseController::class);

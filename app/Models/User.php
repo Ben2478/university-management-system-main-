@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->role === 'parent';
     }
 
+    public function isLecturer(): bool
+    {
+        return $this->role === 'lecturer';
+    }
+
     // Relationships
     public function student()
     {
@@ -80,5 +85,10 @@ class User extends Authenticatable
     public function childrenAsParent()
     {
         return $this->hasMany(Student::class, 'parent_id');
+    }
+
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class);
     }
 }

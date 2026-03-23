@@ -43,6 +43,11 @@ class Course extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function lecturers()
+    {
+        return $this->belongsToMany(Lecturer::class)->withTimestamps();
+    }
+
     public function getEnrolledStudentsCountAttribute()
     {
         return $this->enrollments()->where('status', 'active')->count();

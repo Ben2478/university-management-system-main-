@@ -121,6 +121,20 @@
         .alert-error li {
             margin: 0.25rem 0;
         }
+        .student-fields {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .hint {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.35rem;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +197,40 @@
                 </small>
             </div>
 
+            <div id="student-fields" class="student-fields">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="school_code">School <span style="color:#e74c3c;">*</span></label>
+                        <select id="school_code" name="school_code">
+                            <option value="">Select School</option>
+                            @foreach(config('schools.labels', []) as $code => $label)
+                                <option value="{{ $code }}" {{ old('school_code') == $code ? 'selected' : '' }}>{{ $label }} ({{ $code }})</option>
+                            @endforeach
+                        </select>
+                        <span class="hint">Used to generate your Student ID.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nrc">NRC <span style="color:#e74c3c;">*</span></label>
+                        <input type="text" id="nrc" name="nrc" value="{{ old('nrc') }}" placeholder="######/##/#">
+                        <span class="hint">We use the last 3 digits before the first “/” for your Student ID.</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="enrollment_date">Enrollment Date <span style="color:#e74c3c;">*</span></label>
+                        <input type="date" id="enrollment_date" name="enrollment_date" value="{{ old('enrollment_date') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="generated_student_id">Generated Student ID</label>
+                        <input type="text" id="generated_student_id" readonly value="" placeholder="Auto-generated" style="background:#f7f7f7;">
+                        <span class="hint">Format: Year + School Code + Last 3 NRC digits before the first “/” (no separators)</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label for="password">Password</label>
@@ -225,5 +273,52 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function toggleStudentFields() {
+            const role = document.getElementById('role')?.value;
+            const box = document.getElementById('student-fields');
+            const isStudent = role === 'student';
+            if (box) box.style.display = isStudent ? 'block' : 'none';
+        }
+
+        function computeStudentIdPreview() {
+            const role = document.getElementById('role')?.value;
+            if (role !== 'student') return;
+
+            const schoolCode = document.getElementById('school_code')?.value || '';
+            const nrc = document.getElementById('nrc')?.value || '';
+            const enrollmentDate = document.getElementById('enrollment_date')?.value || '';
+            const out = document.getElementById('generated_student_id');
+            if (!out) return;
+
+            const beforeSlash = (nrc.split('/')[0] || '');
+            const digits = (beforeSlash.match(/\d/g) || []).join('');
+            const last3 = digits.length >= 3 ? digits.slice(-3) : '';
+            const year = enrollmentDate ? String(new Date(enrollmentDate).getFullYear()) : '';
+
+            out.value = (year && schoolCode && last3) ? `${year}${schoolCode}${last3}` : '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleEl = document.getElementById('role');
+            if (roleEl) {
+                roleEl.addEventListener('change', function () {
+                    toggleStudentFields();
+                    computeStudentIdPreview();
+                });
+            }
+
+            ['school_code', 'nrc', 'enrollment_date'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', computeStudentIdPreview);
+                el.addEventListener('change', computeStudentIdPreview);
+            });
+
+            toggleStudentFields();
+            computeStudentIdPreview();
+        });
+    </script>
 </body>
 </html>

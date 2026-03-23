@@ -5,10 +5,36 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Student;
 use App\Models\Course;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
+    private function lecturerCourseIds(): array
+    {
+        $user = auth()->user();
+        if (!$user || !method_exists($user, 'isLecturer') || !$user->isLecturer()) {
+            return [];
+        }
+
+        $lecturer = $user->lecturer;
+        if (!$lecturer) {
+            return [];
+        }
+
+        return $lecturer->courses()->pluck('courses.id')->toArray();
+    }
+
+    private function ensureCanManageCourse(int $courseId): void
+    {
+        $user = auth()->user();
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            if (!in_array($courseId, $this->lecturerCourseIds(), true)) {
+                abort(403, 'You are not assigned to this course.');
+            }
+        }
+    }
+
     // Display all attendance records
     public function index(Request $request)
     {
@@ -40,6 +66,65 @@ class AttendanceController extends Controller
             ];
             
             return view('attendance.student-view', compact('attendances', 'stats', 'student'));
+        }
+
+        if ($user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Lecturer view - only attendance for assigned courses
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $courseIds = $this->lecturerCourseIds();
+            $query = Attendance::with('student', 'course')->whereIn('course_id', $courseIds);
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->whereHas('student', function($sq) use ($search) {
+                        $sq->where('first_name', 'like', "%{$search}%")
+                          ->orWhere('last_name', 'like', "%{$search}%")
+                          ->orWhere('student_id', 'like', "%{$search}%");
+                    })->orWhereHas('course', function($cq) use ($search) {
+                        $cq->where('course_name', 'like', "%{$search}%")
+                           ->orWhere('course_code', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('course_id')) {
+                $query->where('course_id', $request->course_id);
+            }
+
+            if ($request->filled('date_from')) {
+                $query->whereDate('attendance_date', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('attendance_date', '<=', $request->date_to);
+            }
+
+            $attendance = $query->latest('attendance_date')->paginate(15);
+
+            $allRecords = (clone $query)->get();
+            $total = $allRecords->count();
+            $present = $allRecords->where('status', 'present')->count();
+            $absent = $allRecords->where('status', 'absent')->count();
+            $late = $allRecords->where('status', 'late')->count();
+            $presentRate = $total > 0 ? round(($present / $total) * 100, 1) : 0;
+
+            $stats = [
+                'total' => $total,
+                'present_rate' => $presentRate,
+                'absent' => $absent,
+                'late' => $late,
+            ];
+
+            $courses = Course::whereIn('id', $courseIds)->orderBy('course_name')->get();
+
+            return view('attendance.lecturer-index', compact('attendance', 'stats', 'courses'));
         }
         
         // Admin view - show all attendance
@@ -116,7 +201,27 @@ class AttendanceController extends Controller
     // Export attendance to CSV
     public function export(Request $request)
     {
-        $query = Attendance::with('student', 'course');
+        $user = auth()->user();
+
+        if ($user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Student export: only own attendance
+        if ($user->isStudent()) {
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student) {
+                return redirect()->route('dashboard')->with('error', 'Student profile not found');
+            }
+            $query = Attendance::with('student', 'course')->where('student_id', $student->id);
+        } else {
+            $query = Attendance::with('student', 'course');
+        }
+
+        // Lecturer export: only assigned courses
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $query->whereIn('course_id', $this->lecturerCourseIds());
+        }
 
         // Apply same filters as index
         if ($request->filled('search')) {
@@ -175,6 +280,25 @@ class AttendanceController extends Controller
     // Show create attendance form
     public function create()
     {
+        $user = auth()->user();
+        if ($user->isStudent() || $user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $courseIds = $this->lecturerCourseIds();
+            $courses = Course::where('status', 'active')->whereIn('id', $courseIds)->orderBy('course_name')->get();
+
+            $studentIds = Enrollment::whereIn('course_id', $courseIds)
+                ->whereIn('status', ['active', 'completed'])
+                ->pluck('student_id')
+                ->unique()
+                ->values();
+            $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->orderBy('last_name')->get();
+
+            return view('attendance.create', compact('students', 'courses'));
+        }
+
         $students = Student::all();
         $courses = Course::where('status', 'active')->get();
         return view('attendance.create', compact('students', 'courses'));
@@ -183,6 +307,11 @@ class AttendanceController extends Controller
     // Store attendance
     public function store(Request $request)
     {
+        $user = auth()->user();
+        if ($user->isStudent() || $user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'course_id' => 'required|exists:courses,id',
@@ -191,13 +320,67 @@ class AttendanceController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        $this->ensureCanManageCourse((int) $validated['course_id']);
+
+        $enrolled = Enrollment::where('student_id', $validated['student_id'])
+            ->where('course_id', $validated['course_id'])
+            ->whereIn('status', ['active', 'completed'])
+            ->exists();
+        if (!$enrolled) {
+            return back()->withErrors('Student is not enrolled in the selected course.')->withInput();
+        }
+
         Attendance::create($validated);
         return redirect()->route('attendance.index')->with('success', 'Attendance recorded successfully');
+    }
+
+    // Show attendance details
+    public function show(Attendance $attendance)
+    {
+        $user = auth()->user();
+
+        if ($user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($user->isStudent()) {
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student || (int) $attendance->student_id !== (int) $student->id) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $this->ensureCanManageCourse((int) $attendance->course_id);
+        }
+
+        return view('attendance.show', compact('attendance'));
     }
 
     // Show edit form
     public function edit(Attendance $attendance)
     {
+        $user = auth()->user();
+        if ($user->isStudent() || $user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->ensureCanManageCourse((int) $attendance->course_id);
+
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $courseIds = $this->lecturerCourseIds();
+            $courses = Course::where('status', 'active')->whereIn('id', $courseIds)->orderBy('course_name')->get();
+
+            $studentIds = Enrollment::whereIn('course_id', $courseIds)
+                ->whereIn('status', ['active', 'completed'])
+                ->pluck('student_id')
+                ->unique()
+                ->values();
+            $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->orderBy('last_name')->get();
+
+            return view('attendance.edit', compact('attendance', 'students', 'courses'));
+        }
+
         $students = Student::all();
         $courses = Course::where('status', 'active')->get();
         return view('attendance.edit', compact('attendance', 'students', 'courses'));
@@ -206,7 +389,15 @@ class AttendanceController extends Controller
     // Update attendance
     public function update(Request $request, Attendance $attendance)
     {
+        $user = auth()->user();
+        if ($user->isStudent() || $user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->ensureCanManageCourse((int) $attendance->course_id);
+
         $validated = $request->validate([
+            'attendance_date' => 'required|date',
             'status' => 'required|in:present,absent,late,excused',
             'remarks' => 'nullable|string',
         ]);
@@ -218,6 +409,13 @@ class AttendanceController extends Controller
     // Delete attendance
     public function destroy(Attendance $attendance)
     {
+        $user = auth()->user();
+        if ($user->isStudent() || $user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->ensureCanManageCourse((int) $attendance->course_id);
+
         $attendance->delete();
         return redirect()->route('attendance.index')->with('success', 'Attendance deleted successfully');
     }
@@ -225,6 +423,30 @@ class AttendanceController extends Controller
     // Get attendance report for a student
     public function studentReport(Student $student)
     {
+        $user = auth()->user();
+
+        if ($user->isParent()) {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($user->isStudent()) {
+            $selfStudent = Student::where('user_id', $user->id)->first();
+            if (!$selfStudent || (int) $selfStudent->id !== (int) $student->id) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
+        if (method_exists($user, 'isLecturer') && $user->isLecturer()) {
+            $courseIds = $this->lecturerCourseIds();
+            $allowed = Enrollment::where('student_id', $student->id)
+                ->whereIn('course_id', $courseIds)
+                ->whereIn('status', ['active', 'completed'])
+                ->exists();
+            if (!$allowed) {
+                abort(403, 'Unauthorized');
+            }
+        }
+
         $attendance = $student->attendance()->with('course')->get();
         $presentCount = $attendance->where('status', 'present')->count();
         $absentCount = $attendance->where('status', 'absent')->count();

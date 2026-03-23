@@ -139,15 +139,28 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="student_id">Student ID *</label>
-                        <input type="text" id="student_id" name="student_id" required value="{{ old('student_id') }}">
-                        @error('student_id') <span class="error">{{ $message }}</span> @enderror
+                        <label for="school_code">School <span style="color:#e74c3c;">*</span></label>
+                        <select id="school_code" name="school_code" required>
+                            <option value="">Select School</option>
+                            @foreach(($schools ?? []) as $code => $label)
+                                <option value="{{ $code }}" {{ old('school_code') == $code ? 'selected' : '' }}>{{ $label }} ({{ $code }})</option>
+                            @endforeach
+                        </select>
+                        @error('school_code') <span class="error">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
-                        <label for="nrc">National Registration Card (NRC)</label>
-                        <input type="text" id="nrc" name="nrc" placeholder="######/##/#" value="{{ old('nrc') }}">
+                        <label for="nrc">National Registration Card (NRC) <span style="color:#e74c3c;">*</span></label>
+                        <input type="text" id="nrc" name="nrc" required placeholder="######/##/#" value="{{ old('nrc') }}">
                         @error('nrc') <span class="error">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="generated_student_id">Generated Student ID</label>
+                        <input type="text" id="generated_student_id" readonly value="" placeholder="Will be generated automatically" style="background:#f7f7f7;">
+                        <small style="color:#666; font-size:12px; display:block; margin-top:6px;">Format: Enrollment Year + School Code + Last 3 NRC digits before the first “/”</small>
                     </div>
                 </div>
 
@@ -294,5 +307,37 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function computeStudentIdPreview() {
+            const schoolCode = document.getElementById('school_code')?.value || '';
+            const nrc = document.getElementById('nrc')?.value || '';
+            const enrollmentDate = document.getElementById('enrollment_date')?.value || '';
+            const out = document.getElementById('generated_student_id');
+
+            if (!out) return;
+
+            const beforeSlash = (nrc.split('/')[0] || '');
+            const digits = (beforeSlash.match(/\d/g) || []).join('');
+            const last3 = digits.length >= 3 ? digits.slice(-3) : '';
+            const year = enrollmentDate ? String(new Date(enrollmentDate).getFullYear()) : '';
+
+            if (year && schoolCode && last3) {
+                out.value = `${year}${schoolCode}${last3}`;
+            } else {
+                out.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            ['school_code', 'nrc', 'enrollment_date'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.addEventListener('input', computeStudentIdPreview);
+                el.addEventListener('change', computeStudentIdPreview);
+            });
+            computeStudentIdPreview();
+        });
+    </script>
 </body>
 </html>

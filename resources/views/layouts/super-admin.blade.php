@@ -16,6 +16,26 @@
             background: #f5f7fa;
             color: #333;
         }
+        .nav-toggle {
+            display: none;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-radius: 0.5rem;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        .nav-toggle:hover { background: rgba(255,255,255,0.14); }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1500;
+        }
         .navbar {
             background: #2c3e50;
             color: white;
@@ -24,6 +44,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            gap: 1rem;
         }
         .navbar h1 { font-size: 1.5rem; }
         .navbar-right { display: flex; gap: 2rem; align-items: center; }
@@ -73,6 +94,8 @@
             color: white;
             padding: 2rem 0;
             overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
         }
         .sidebar h3 {
             padding: 0 1.5rem;
@@ -125,6 +148,8 @@
             text-decoration: none;
             transition: all 0.3s;
             border-left: 3px solid transparent;
+            border-radius: 0.5rem;
+            margin: 0.125rem 0.75rem;
         }
         .sidebar a:hover {
             background: rgba(255,255,255,0.1);
@@ -134,6 +159,23 @@
             background: rgba(52, 152, 219, 0.2);
             border-left-color: #3498db;
             color: #3498db;
+        }
+        @media (max-width: 980px) {
+            .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+            .sidebar {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                height: calc(100vh - 70px);
+                transform: translateX(-102%);
+                transition: transform 0.25s ease;
+                z-index: 2000;
+                width: 290px;
+            }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open .sidebar-overlay { display: block; }
+            body.sidebar-open { overflow: hidden; }
+            .wrapper { min-height: auto; }
         }
         .content {
             flex: 1;
@@ -193,6 +235,7 @@
 </head>
 <body>
     <div class="navbar">
+        <button class="nav-toggle" type="button" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
         <h1>🎓 Student Management System - Super Admin</h1>
         <div class="navbar-right">
             <div class="user-info">
@@ -211,8 +254,10 @@
         </form>
     </div>
 
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
     <div class="wrapper">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <!-- Dashboard -->
             <div class="sidebar-section">
                 <a href="{{ route('dashboard') }}" style="padding-left: 1.5rem;">
@@ -229,6 +274,7 @@
                 <div id="academic" class="sidebar-items">
                     <a href="{{ route('programs.index') }}" style="padding-left: 3rem;">Programs</a>
                     <a href="{{ route('students.index') }}" style="padding-left: 3rem;">Students</a>
+                    <a href="{{ route('lecturers.index') }}" style="padding-left: 3rem;">Lecturers</a>
                     <a href="{{ route('courses.index') }}" style="padding-left: 3rem;">Courses</a>
                     <a href="{{ route('enrollments.index') }}" style="padding-left: 3rem;">Enrollments</a>
                 </div>
@@ -307,6 +353,14 @@
         </main>
     </div>
     <script>
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+        }
+
+        function closeSidebar() {
+            document.body.classList.remove('sidebar-open');
+        }
+
         function toggleSection(sectionId) {
             const section = document.getElementById(sectionId);
             const header = section.previousElementSibling;
@@ -335,6 +389,43 @@
                     header.classList.add('active');
                 }
             });
+
+            // Active link highlighting
+            const currentPath = window.location.pathname.replace(/\/+$/, '');
+            const links = document.querySelectorAll('#sidebar a[href]');
+            let bestMatch = null;
+            let bestLength = -1;
+
+            links.forEach((link) => {
+                try {
+                    const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
+                    if (linkPath === '' || linkPath === '/') {
+                        if (currentPath === '/' && linkPath.length > bestLength) {
+                            bestMatch = link;
+                            bestLength = linkPath.length;
+                        }
+                        return;
+                    }
+
+                    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
+                        if (linkPath.length > bestLength) {
+                            bestMatch = link;
+                            bestLength = linkPath.length;
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            });
+
+            if (bestMatch) {
+                bestMatch.classList.add('active');
+                const parentItems = bestMatch.closest('.sidebar-items');
+                if (parentItems && !parentItems.classList.contains('open')) {
+                    parentItems.classList.add('open');
+                    parentItems.previousElementSibling?.classList.add('active');
+                }
+            }
         });
     </script>
 </body>

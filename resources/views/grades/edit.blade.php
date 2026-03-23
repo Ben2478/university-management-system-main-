@@ -1,4 +1,4 @@
-@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
+@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
 <div class="container" style="max-width: 600px; margin: 30px auto;">
@@ -35,19 +35,32 @@
         </div>
 
         <div style="margin-bottom: 20px;">
-            <label for="score" style="display: block; margin-bottom: 8px; font-weight: bold;">Score (0-100):</label>
-            <input type="number" id="score" name="score" min="0" max="100" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" value="{{ $grade->score }}">
+            <label for="assignment_score" style="display: block; margin-bottom: 8px; font-weight: bold;">Assignment Score (0-100):</label>
+            <input type="number" id="assignment_score" name="assignment_score" min="0" max="100" step="0.01" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" 
+                   value="{{ old('assignment_score', $grade->assignment_score) }}" onchange="calculateOverall()">
         </div>
 
         <div style="margin-bottom: 20px;">
-            <label for="grade_letter" style="display: block; margin-bottom: 8px; font-weight: bold;">Grade Letter:</label>
-            <select id="grade_letter" name="grade_letter" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                <option value="A" {{ $grade->grade_letter == 'A' ? 'selected' : '' }}>A (90-100)</option>
-                <option value="B" {{ $grade->grade_letter == 'B' ? 'selected' : '' }}>B (80-89)</option>
-                <option value="C" {{ $grade->grade_letter == 'C' ? 'selected' : '' }}>C (70-79)</option>
-                <option value="D" {{ $grade->grade_letter == 'D' ? 'selected' : '' }}>D (60-69)</option>
-                <option value="F" {{ $grade->grade_letter == 'F' ? 'selected' : '' }}>F (Below 60)</option>
-            </select>
+            <label for="midterm_score" style="display: block; margin-bottom: 8px; font-weight: bold;">Midterm Score (0-100):</label>
+            <input type="number" id="midterm_score" name="midterm_score" min="0" max="100" step="0.01" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" 
+                   value="{{ old('midterm_score', $grade->midterm_score) }}" onchange="calculateOverall()">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="final_score" style="display: block; margin-bottom: 8px; font-weight: bold;">Final Score (0-100):</label>
+            <input type="number" id="final_score" name="final_score" min="0" max="100" step="0.01" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" 
+                   value="{{ old('final_score', $grade->final_score) }}" onchange="calculateOverall()">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="overall_score" style="display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50;">Overall Score (Auto-calculated):</label>
+            <input type="number" id="overall_score" name="overall_score" min="0" max="100" step="0.01" readonly
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5;" 
+                   value="{{ old('overall_score', $grade->overall_score) }}">
+            <small style="color: #666;">Calculated as: 30% assignment + 30% midterm + 40% final</small>
         </div>
 
         <div style="margin-bottom: 20px;">
@@ -61,4 +74,17 @@
         </div>
     </form>
 </div>
+
+<script>
+    function calculateOverall() {
+        const assignment = parseFloat(document.getElementById('assignment_score').value) || 0;
+        const midterm = parseFloat(document.getElementById('midterm_score').value) || 0;
+        const final = parseFloat(document.getElementById('final_score').value) || 0;
+
+        const overall = (assignment * 0.3) + (midterm * 0.3) + (final * 0.4);
+        document.getElementById('overall_score').value = overall.toFixed(2);
+    }
+
+    calculateOverall();
+</script>
 @endsection

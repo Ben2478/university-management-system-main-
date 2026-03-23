@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Lecturer;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -18,7 +19,7 @@ class CourseController extends Controller
     // Display all courses
     public function index(Request $request)
     {
-        $query = Course::query();
+        $query = Course::with(['lecturers'])->withCount('enrollments');
 
         // Search by course name or code
         if ($request->filled('search')) {
@@ -63,7 +64,8 @@ class CourseController extends Controller
                 ->with('error', 'Please create at least one program before adding courses. Courses must belong to a program.');
         }
         
-        return view('courses.create', compact('programs'));
+        $lecturers = Lecturer::where('status', 'active')->orderBy('first_name')->orderBy('last_name')->get();
+        return view('courses.create', compact('programs', 'lecturers'));
     }
 
     // Store course
@@ -79,15 +81,24 @@ class CourseController extends Controller
             'instructor' => 'nullable|string',
             'tuition_fee' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
+            'lecturer_ids' => 'nullable|array',
+            'lecturer_ids.*' => 'integer|exists:lecturers,id',
         ]);
 
-        Course::create($validated);
+        $lecturerIds = $validated['lecturer_ids'] ?? [];
+        unset($validated['lecturer_ids']);
+
+        $course = Course::create($validated);
+        if (!empty($lecturerIds)) {
+            $course->lecturers()->sync($lecturerIds);
+        }
         return redirect()->route('courses.index')->with('success', 'Course created successfully');
     }
 
     // Show course details
     public function show(Course $course)
     {
+        $course->load(['lecturers']);
         return view('courses.show', compact('course'));
     }
 
@@ -95,7 +106,9 @@ class CourseController extends Controller
     public function edit(Course $course)
     {
         $programs = $this->getPrograms();
-        return view('courses.edit', compact('course', 'programs'));
+        $lecturers = Lecturer::where('status', 'active')->orderBy('first_name')->orderBy('last_name')->get();
+        $course->load('lecturers');
+        return view('courses.edit', compact('course', 'programs', 'lecturers'));
     }
 
     // Update course
@@ -110,9 +123,16 @@ class CourseController extends Controller
             'instructor' => 'nullable|string',
             'tuition_fee' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
+            'lecturer_ids' => 'nullable|array',
+            'lecturer_ids.*' => 'integer|exists:lecturers,id',
         ]);
 
+        $lecturerIds = $validated['lecturer_ids'] ?? [];
+        unset($validated['lecturer_ids']);
+
         $course->update($validated);
+
+        $course->lecturers()->sync($lecturerIds);
         return redirect()->route('courses.show', $course)->with('success', 'Course updated successfully');
     }
 

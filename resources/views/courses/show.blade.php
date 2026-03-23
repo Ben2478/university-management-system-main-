@@ -22,11 +22,21 @@
             </div>
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Credit Hours</h4>
-                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $course->credit_hours }}</p>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $course->credit_hours ?? $course->credits ?? 'N/A' }}</p>
             </div>
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Instructor</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $course->instructor ?? 'Not assigned' }}</p>
+            </div>
+            <div>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Lecturers</h4>
+                @if($course->lecturers && $course->lecturers->count() > 0)
+                    <p style="color: #2c3e50; font-weight: bold;">
+                        {{ $course->lecturers->pluck('full_name')->join(', ') }}
+                    </p>
+                @else
+                    <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">Not assigned</p>
+                @endif
             </div>
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Semester</h4>

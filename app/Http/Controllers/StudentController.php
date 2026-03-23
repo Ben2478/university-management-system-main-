@@ -171,18 +171,27 @@ class StudentController extends Controller
     // Show create student form
     public function create()
     {
-        return view('students.create');
+        $schools = config('schools.labels', []);
+        return view('students.create', compact('schools'));
     }
 
     // Store student
     public function store(Request $request)
     {
+        $allowedSchoolCodes = array_keys(config('schools.labels', []));
+
         $validated = $request->validate([
-            'student_id' => 'required|unique:students',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:students',
-            'nrc' => 'nullable|string|max:20',
+            'school_code' => ['required', 'string', 'in:' . implode(',', $allowedSchoolCodes)],
+            'nrc' => ['required', 'string', 'max:50', function ($attribute, $value, $fail) {
+                $beforeSlash = explode('/', (string) $value, 2)[0] ?? '';
+                $digits = preg_replace('/\D+/', '', (string) $beforeSlash);
+                if (strlen($digits) < 3) {
+                    $fail('The NRC must contain at least 3 digits before the first "/".');
+                }
+            }],
             'phone' => 'nullable|string|max:20',
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:male,female,other',
@@ -197,6 +206,28 @@ class StudentController extends Controller
             'tuition_fee' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive,graduated,suspended',
         ]);
+
+        // Generate student ID: YYYY + school_code + last3digits(NRC before first '/')
+        $year = (string) date('Y', strtotime($validated['enrollment_date']));
+        $beforeSlash = explode('/', (string) $validated['nrc'], 2)[0] ?? '';
+        $digits = preg_replace('/\D+/', '', (string) $beforeSlash);
+        $last3 = substr($digits, -3);
+        $baseStudentId = $year . $validated['school_code'] . $last3;
+
+        $studentId = $baseStudentId;
+        if (Student::where('student_id', $studentId)->exists()) {
+            // Collision handling: append a two-digit suffix (01..99)
+            for ($i = 1; $i <= 99; $i++) {
+                $candidate = $baseStudentId . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+                if (!Student::where('student_id', $candidate)->exists()) {
+                    $studentId = $candidate;
+                    break;
+                }
+            }
+        }
+
+        unset($validated['school_code']);
+        $validated['student_id'] = $studentId;
 
         // Generate random password for student
         $password = Str::random(8);

@@ -1,17 +1,19 @@
-@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
+@extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
 <div class="container" style="max-width: 800px; margin: 30px auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <h2>Grade Record</h2>
-        <div style="display: flex; gap: 10px;">
-            <a href="{{ route('grades.edit', $grade) }}" class="btn-primary" style="padding: 10px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 4px;">Edit</a>
-            <form action="{{ route('grades.destroy', $grade) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn-danger" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
-            </form>
-        </div>
+        @if(!auth()->user()->isStudent() && !auth()->user()->isParent())
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ route('grades.edit', $grade) }}" class="btn-primary" style="padding: 10px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 4px;">Edit</a>
+                <form action="{{ route('grades.destroy', $grade) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn-danger" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                </form>
+            </div>
+        @endif
     </div>
 
     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
@@ -25,14 +27,30 @@
                 <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->course->course_name }}</p>
             </div>
             <div>
-                <h4 style="color: #34495e; margin-bottom: 10px;">Score</h4>
-                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->score }}/100</p>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Assignment</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->assignment_score ?? '-' }}</p>
+            </div>
+            <div>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Midterm</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->midterm_score ?? '-' }}</p>
+            </div>
+            <div>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Final</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->final_score ?? '-' }}</p>
+            </div>
+            <div>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Overall</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->overall_score ?? '-' }}/100</p>
             </div>
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Grade</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #f39c12;">
-                    <span style="padding: 5px 10px; background: #f39c12; color: white; border-radius: 4px;">{{ $grade->grade_letter }}</span>
+                    <span style="padding: 5px 10px; background: #f39c12; color: white; border-radius: 4px;">{{ $grade->grade ?? '-' }}</span>
                 </p>
+            </div>
+            <div>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Graded Date</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->graded_date ? $grade->graded_date->format('Y-m-d') : '-' }}</p>
             </div>
         </div>
 
