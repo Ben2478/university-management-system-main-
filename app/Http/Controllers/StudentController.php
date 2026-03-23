@@ -92,9 +92,9 @@ class StudentController extends Controller
         // Filter by financial status
         if ($request->filled('financial_status')) {
             if ($request->financial_status === 'owing') {
-                $query->whereRaw('tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = "completed")');
+                $query->whereRaw("tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = 'completed')");
             } elseif ($request->financial_status === 'paid') {
-                $query->whereRaw('tuition_fee <= (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = "completed")');
+                $query->whereRaw("tuition_fee <= (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = 'completed')");
             }
         }
 
@@ -116,7 +116,7 @@ class StudentController extends Controller
             'total_fees' => Student::sum('tuition_fee'),
             'total_collected' => \App\Models\Payment::where('status', 'completed')->sum('amount'),
             'pending_receipts' => \App\Models\Receipt::where('status', 'pending')->count(),
-            'students_owing' => Student::whereRaw('tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = "completed")')->count(),
+            'students_owing' => Student::whereRaw("tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE payments.student_id = students.id AND payments.status = 'completed')")->count(),
         ];
         
         // Calculate outstanding balance

@@ -302,9 +302,9 @@ class DashboardController extends Controller
             
             // Student stats
             'total_students' => Student::count(),
-            'students_with_balance' => Student::whereRaw('tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE student_id = students.id AND status = "completed")')
+            'students_with_balance' => Student::whereRaw("tuition_fee > (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE student_id = students.id AND status = 'completed')")
                 ->count(),
-            'fully_paid' => Student::whereRaw('tuition_fee <= (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE student_id = students.id AND status = "completed")')
+            'fully_paid' => Student::whereRaw("tuition_fee <= (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE student_id = students.id AND status = 'completed')")
                 ->count(),
         ];
 
