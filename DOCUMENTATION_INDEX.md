@@ -35,6 +35,7 @@
 | **QUICKSTART.md** | Project quick start |
 | **SETUP_COMPLETE.md** | Initial setup status |
 | **PROJECT_OVERVIEW.md** | System overview |
+| **LARAVEL_CLOUD_DB_MIGRATION.md** | Move local MySQL DB to Laravel Cloud |
 | **README.md** | Project readme |
 
 ---
