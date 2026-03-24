@@ -81,13 +81,17 @@
 <body>
     <div class="card">
         <div class="header">
-            <h1>Create User (Admin Only)</h1>
+            <h1>Create User (Super Admin Only)</h1>
             <p>Phoenix Open University</p>
         </div>
 
         <div class="body">
             <div class="note">
                 Default password for new users is <code>welcome123</code>. They will be forced to change it at first login.
+            </div>
+
+            <div class="small" style="margin: 0 0 1rem 0; text-align:left;">
+                This page creates staff accounts only (Admin or Super Admin).
             </div>
 
 
@@ -126,9 +130,12 @@
 
                 <div class="row">
                     <div class="form-group">
-                        <label>Role</label>
-                        <input type="text" value="Admin" disabled>
-                        <div class="small">This page only creates Admin accounts.</div>
+                        <label for="role">Role</label>
+                        <select id="role" name="role" required>
+                            <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                            <option value="super_admin" @selected(old('role') === 'super_admin')>Super Admin</option>
+                        </select>
+                        <div class="small">Users created here log in with Email + <code>welcome123</code>.</div>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone (optional)</label>

@@ -26,15 +26,18 @@ class AdminRegisterController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['required', 'in:super_admin,admin'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $email = strtolower(trim($validated['email']));
+        $name = trim($validated['name']);
+
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            // Keep this limited. Promote to super_admin via DB or admin tooling after first login.
-            'role' => 'admin',
+            'name' => $name,
+            'email' => $email,
+            'role' => $validated['role'],
             'phone' => $validated['phone'] ?? null,
             'address' => $validated['address'] ?? null,
             'password' => Hash::make(self::DEFAULT_PASSWORD),

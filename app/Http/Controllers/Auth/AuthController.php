@@ -8,6 +8,7 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -35,7 +36,7 @@ class AuthController extends Controller
         // Staff/management/lecturers login via email
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
             $credentials = [
-                'email' => $identifier,
+                'email' => Str::lower($identifier),
                 'password' => $validated['password'],
             ];
         } else {
