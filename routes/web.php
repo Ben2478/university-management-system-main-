@@ -20,6 +20,12 @@ use App\Http\Controllers\Auth\AdminRegisterController;
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+// Bootstrap registration (public) - intended for FIRST TIME setup only.
+Route::get('/register', [AdminRegisterController::class, 'create'])
+    ->name('register')
+    ->middleware(['guest', 'throttle:30,1']);
+Route::post('/register', [AdminRegisterController::class, 'store'])
+    ->middleware(['guest', 'throttle:30,1']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Force password change for first-time logins
@@ -37,13 +43,6 @@ Route::get('/', [DashboardController::class, 'index'])
 
 // Redirect login to dashboard if already authenticated
 Route::middleware(['auth', 'password.changed'])->group(function () {
-    // Create staff users (Super Admin only)
-    Route::get('/register', [AdminRegisterController::class, 'create'])
-        ->name('register')
-        ->middleware(['role:super_admin', 'throttle:30,1']);
-    Route::post('/register', [AdminRegisterController::class, 'store'])
-        ->middleware(['role:super_admin', 'throttle:30,1']);
-
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
     
     // Profile Routes

@@ -81,7 +81,7 @@
 <body>
     <div class="card">
         <div class="header">
-            <h1>Create User (Super Admin Only)</h1>
+            <h1>System Setup</h1>
             <p>Phoenix Open University</p>
         </div>
 
@@ -90,9 +90,16 @@
                 Default password for new users is <code>welcome123</code>. They will be forced to change it at first login.
             </div>
 
-            <div class="small" style="margin: 0 0 1rem 0; text-align:left;">
-                This page creates staff accounts only (Admin or Super Admin).
-            </div>
+            @if(!empty($bootstrap_closed))
+                <div class="alert alert-error">
+                    Setup is complete. Registration is now closed.
+                    <div class="small" style="text-align:left; margin-top:.5rem;">Please log in with the Super Admin account created during setup.</div>
+                </div>
+            @else
+                <div class="small" style="margin: 0 0 1rem 0; text-align:left;">
+                    First-time setup: create the school Super Admin (recommended). After that, registration will close automatically.
+                </div>
+            @endif
 
 
             @if(session('success'))
@@ -115,7 +122,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" @if(!empty($bootstrap_closed)) style="opacity:.6; pointer-events:none;" @endif>
                 @csrf
 
                 <div class="form-group">
@@ -133,7 +140,9 @@
                         <label for="role">Role</label>
                         <select id="role" name="role" required>
                             <option value="admin" @selected(old('role') === 'admin')>Admin</option>
-                            <option value="super_admin" @selected(old('role') === 'super_admin')>Super Admin</option>
+                            @if(!empty($can_create_super_admin))
+                                <option value="super_admin" @selected(old('role') === 'super_admin')>Super Admin</option>
+                            @endif
                         </select>
                         <div class="small">Users created here log in with Email + <code>welcome123</code>.</div>
                     </div>
