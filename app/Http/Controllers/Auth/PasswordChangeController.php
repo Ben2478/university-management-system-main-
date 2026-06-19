@@ -29,7 +29,7 @@ class PasswordChangeController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
             'must_change_password' => false,
         ]);
 

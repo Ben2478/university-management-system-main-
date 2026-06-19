@@ -196,7 +196,7 @@
                     value="{{ old('identifier') }}" 
                     required 
                     autofocus
-                    placeholder="e.g., 202501123 or staff@school.edu"
+                    placeholder="Enter your Student ID or Email"
                 >
             </div>
 

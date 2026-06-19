@@ -22,7 +22,7 @@ class InitialUsersSeeder extends Seeder
             ['email' => $superAdminEmail],
             [
                 'name' => $superAdminName,
-                'password' => Hash::make('welcome123'),
+                'password' => 'welcome123',
                 'role' => 'super_admin',
                 'phone' => '+260123456789',
                 'address' => '123 Admin Street',
@@ -34,7 +34,7 @@ class InitialUsersSeeder extends Seeder
             ['email' => $adminEmail],
             [
                 'name' => $adminName,
-                'password' => Hash::make('welcome123'),
+                'password' => 'welcome123',
                 'role' => 'admin',
                 'phone' => '+260123456790',
                 'address' => '456 Finance Avenue',
@@ -63,7 +63,7 @@ class InitialUsersSeeder extends Seeder
                 ['email' => $email],
                 [
                     'name' => (string) $nameGuess,
-                    'password' => Hash::make('welcome123'),
+                    'password' => 'welcome123',
                     'role' => 'admin',
                     'must_change_password' => true,
                 ]

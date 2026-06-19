@@ -236,7 +236,7 @@ class StudentController extends Controller
         $user = User::create([
             'name' => $validated['first_name'] . ' ' . $validated['last_name'],
             'email' => $validated['email'],
-            'password' => Hash::make($password),
+                'password' => $password,
             'role' => 'student',
             'phone' => $validated['phone'] ?? null,
             'must_change_password' => true,

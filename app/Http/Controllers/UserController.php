@@ -85,7 +85,7 @@ class UserController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
-        $validated['password'] = Hash::make(self::DEFAULT_PASSWORD);
+        $validated['password'] = self::DEFAULT_PASSWORD;
         $validated['must_change_password'] = true;
 
         User::create($validated);
@@ -136,7 +136,8 @@ class UserController extends Controller
             $request->validate([
                 'password' => 'required|string|min:8|confirmed',
             ]);
-            $validated['password'] = Hash::make($request->password);
+            $validated['password'] = $request->password;
+            $validated['must_change_password'] = true;
         }
 
         $user->update($validated);
@@ -179,7 +180,7 @@ class UserController extends Controller
         ]);
 
         $user->update([
-            'password' => Hash::make($validated['new_password']),
+            'password' => $validated['new_password'],
             'must_change_password' => true,
         ]);
 
