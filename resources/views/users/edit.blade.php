@@ -50,9 +50,10 @@
                     <select name="role" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="super_admin" {{ $user->role == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                        <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Accountant (Admin)</option>
                         <option value="student" {{ $user->role == 'student' ? 'selected' : '' }}>Student</option>
                         <option value="parent" {{ $user->role == 'parent' ? 'selected' : '' }}>Parent</option>
+                        <option value="lecturer" {{ $user->role == 'lecturer' ? 'selected' : '' }}>Lecturer</option>
                     </select>
                 </div>
 

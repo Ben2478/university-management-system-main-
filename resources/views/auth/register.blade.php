@@ -139,7 +139,7 @@
                     <div class="form-group">
                         <label for="role">Role</label>
                         <select id="role" name="role" required>
-                            <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                            <option value="admin" @selected(old('role') === 'admin')>Accountant (Admin)</option>
                             @if(!empty($can_create_super_admin))
                                 <option value="super_admin" @selected(old('role') === 'super_admin')>Super Admin</option>
                             @endif

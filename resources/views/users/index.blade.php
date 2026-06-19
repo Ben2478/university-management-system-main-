@@ -94,7 +94,7 @@
             <div class="stat-value">{{ $stats['super_admins'] }}</div>
         </div>
         <div class="stat-card admin">
-            <div class="stat-label">🟢 Admins</div>
+            <div class="stat-label">🟢 Accountants</div>
             <div class="stat-value">{{ $stats['admins'] }}</div>
         </div>
         <div class="stat-card student">
@@ -127,9 +127,10 @@
                     <select name="role" class="w-full px-3 py-2 border border-gray-300 rounded-md">
                         <option value="">All Roles</option>
                         <option value="super_admin" {{ request('role') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Accountant (Admin)</option>
                         <option value="student" {{ request('role') == 'student' ? 'selected' : '' }}>Student</option>
                         <option value="parent" {{ request('role') == 'parent' ? 'selected' : '' }}>Parent</option>
+                        <option value="lecturer" {{ request('role') == 'lecturer' ? 'selected' : '' }}>Lecturer</option>
                     </select>
                 </div>
                 <div>
@@ -190,7 +191,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="role-badge role-{{ $user->role }}">
-                                {{ ucfirst(str_replace('_', ' ', $user->role)) }}
+                                {{ $user->role === 'admin' ? 'Accountant' : ucfirst(str_replace('_', ' ', $user->role)) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
