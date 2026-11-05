@@ -1,8 +1,9 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="padding: 2rem 0;">
+    <div class="finance-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">My Payment History</h1>
             <p style="margin: 0; color: #666;">Track your completed and pending payments</p>
@@ -16,7 +17,7 @@
     @endif
 
     <!-- Payment Summary Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="finance-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Total Tuition Fee</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">K{{ number_format($stats['tuition_fee'], 2) }}</h2>
@@ -64,12 +65,12 @@
 
     <!-- Payments Table -->
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div class="finance-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h3 style="margin: 0; color: #2c3e50;">Payment Transactions ({{ $payments->total() }})</h3>
         </div>
 
         @if($payments->count() > 0)
-        <div style="overflow-x: auto;">
+        <div class="finance-table-scroll" tabindex="0" role="region" aria-label="My payment transactions">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background: #34495e; color: white;">

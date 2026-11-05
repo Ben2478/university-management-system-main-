@@ -77,8 +77,9 @@
         .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
         .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/authentication.css') }}?v={{ filemtime(public_path('css/authentication.css')) }}">
 </head>
-<body>
+<body class="authentication">
     <div class="card">
         <div class="header">
             <h1>System Setup</h1>

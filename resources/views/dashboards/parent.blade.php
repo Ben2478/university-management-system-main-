@@ -1,37 +1,31 @@
 @extends('layouts.parent')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <h1 style="margin-bottom: 0.5rem;">Parent Portal</h1>
-    <p style="color: #666; margin-bottom: 2rem;">Welcome, {{ auth()->user()->name }}! Monitor your children's academic progress.</p>
-
-    <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="card" style="border-left: 4px solid #3498db;">
-            <p style="margin: 0; color: #666; font-size: 0.875rem;">Children Enrolled</p>
-            <h2 style="margin: 0.5rem 0; color: #3498db;">{{ $stats['children_count'] }}</h2>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #e74c3c;">
-            <p style="margin: 0; color: #666; font-size: 0.875rem;">Total Balance Due</p>
-            <h2 style="margin: 0.5rem 0; color: #e74c3c;">K{{ number_format($stats['total_balance_due'], 2) }}</h2>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #27ae60;">
-            <p style="margin: 0; color: #666; font-size: 0.875rem;">Total Paid</p>
-            <h2 style="margin: 0.5rem 0; color: #27ae60;">K{{ number_format($stats['total_paid'], 2) }}</h2>
-        </div>
-    </div>
+<style>
+    .parent-dashboard { padding-top:1.25rem !important; }
+    .parent-dashboard-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .parent-children-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:1rem; }
+    .parent-dashboard .card, .parent-child-card { min-width:0; border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .parent-child-card { padding:1.15rem; background:#fff; }
+    @media (max-width:600px) { .parent-dashboard { padding:1rem !important; } .parent-dashboard-stats { grid-template-columns:1fr; gap:.7rem; } }
+</style>
+<div class="container parent-dashboard dashboard-workspace" data-dashboard="parent">
+    @include('components.dashboard-heading', ['area' => 'Family workspace', 'title' => 'Family overview', 'description' => 'Welcome back, ' . auth()->user()->name . '.'])
+    @include('components.dashboard-metrics', ['metrics' => [
+        ['label' => 'Children Enrolled', 'value' => $stats['children_count'], 'detail' => 'Linked student accounts', 'icon' => 'students', 'tone' => 'blue'],
+        ['label' => 'Total Balance Due', 'value' => 'K' . number_format($stats['total_balance_due'], 2), 'detail' => 'Outstanding tuition balance', 'icon' => 'payments', 'tone' => 'rose'],
+        ['label' => 'Total Paid', 'value' => 'K' . number_format($stats['total_paid'], 2), 'detail' => 'Payments received', 'icon' => 'receipts', 'tone' => 'green'],
+    ]])
 
     <!-- Children Overview -->
-    <div class="card">
+    <div class="card parent-children-section">
         <h3 style="margin-top: 0;">Children's Accounts</h3>
         @if($children_summary->isEmpty())
             <p style="color: #666;">No children accounts linked.</p>
         @else
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div class="parent-children-grid">
                 @foreach($children_summary as $child)
-                <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 0.25rem; background: #f8f9fa;">
+                <div class="parent-child-card">
                     <h4 style="margin: 0 0 1rem 0;">{{ $child['name'] }}</h4>
                     <p style="margin: 0 0 0.5rem 0; font-size: 0.875rem; color: #666;">
                         <strong>Student ID:</strong> {{ $child['student_id'] }}

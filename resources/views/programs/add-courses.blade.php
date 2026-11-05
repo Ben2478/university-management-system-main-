@@ -1,8 +1,9 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="padding: 2rem;">
-    <div style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management academic-form-page">
+    <div class="academic-header">
         <h1 style="margin: 0 0 0.5rem 0;">Add Courses for {{ $program->name }}</h1>
         <p style="margin: 0; color: #666;">Add multiple courses to this program at once</p>
     </div>
@@ -18,20 +19,20 @@
         </div>
     @endif
 
-    <form action="{{ route('programs.store-courses', $program) }}" method="POST" id="coursesForm" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form action="{{ route('programs.store-courses', $program) }}" method="POST" id="coursesForm" class="academic-surface">
         @csrf
 
         <div id="coursesContainer">
             <!-- Course Row Template -->
             <div class="course-row" style="padding: 1.5rem; border: 2px solid #e3f2fd; border-radius: 0.5rem; margin-bottom: 1.5rem; position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="academic-header">
                     <h3 style="margin: 0; color: #1976d2;">Course #<span class="course-number">1</span></h3>
-                    <button type="button" class="remove-course-btn" onclick="removeCourse(this)" style="display: none; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600;">
+                    <button type="button" class="remove-course-btn academic-danger" onclick="removeCourse(this)" style="display: none; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600;">
                         × Remove
                     </button>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                <div class="academic-grid" style="margin-bottom: 1rem;">
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Course Code <span style="color: #e74c3c;">*</span></label>
                         <input type="text" name="courses[0][course_code]" required placeholder="e.g., CS101" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem;" value="{{ old('courses.0.course_code') }}">
@@ -43,10 +44,10 @@
                     </div>
 
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Semester <span style="color: #e74c3c;">*</span></label>
-                        <select name="courses[0][semester]" required style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem; background: white;">
-                            @for($i = 1; $i <= 8; $i++)
-                                <option value="{{ $i }}" {{ old('courses.0.semester') == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Term <span style="color: #e74c3c;">*</span></label>
+                        <select name="courses[0][term]" required style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem; background: white;">
+                            @for($term = 1; $term <= 3; $term++)
+                                <option value="{{ $term }}" {{ old('courses.0.term') == $term ? 'selected' : '' }}>Term {{ $term }}</option>
                             @endfor
                         </select>
                     </div>
@@ -57,7 +58,7 @@
                     <input type="text" name="courses[0][course_name]" required placeholder="e.g., Introduction to Programming" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem;" value="{{ old('courses.0.course_name') }}">
                 </div>
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="academic-grid" style="margin-bottom: 1rem;">
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Instructor</label>
                         <input type="text" name="courses[0][instructor]" placeholder="e.g., Dr. John Smith" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem;" value="{{ old('courses.0.instructor') }}">
@@ -82,11 +83,11 @@
         </button>
 
         <!-- Submit Buttons -->
-        <div style="display: flex; gap: 1rem;">
+        <div class="academic-actions academic-form-actions">
             <button type="submit" style="flex: 1; padding: 1rem; background: #27ae60; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; font-weight: 600;">
                 ✓ Save All Courses
             </button>
-            <a href="{{ route('programs.show', $program) }}" style="flex: 1; padding: 1rem; background: #95a5a6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
+            <a href="{{ route('programs.show', $program) }}" class="academic-secondary" style="flex: 1; padding: 1rem; background: #95a5a6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
                 Skip for Now
             </a>
         </div>

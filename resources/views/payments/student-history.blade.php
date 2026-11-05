@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container mx-auto px-4 py-8 finance-management">
     <div class="mb-8">
         <a href="{{ route('students.show', $student) }}" class="text-blue-600 hover:text-blue-900">&larr; Back to Student</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-4">Payment History</h1>
@@ -14,7 +15,7 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="finance-table-scroll bg-white rounded-lg shadow" tabindex="0" role="region" aria-label="Student payment history">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -65,9 +66,9 @@
     </div>
 
     @if($payments->total() > 0)
-        <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <div class="finance-panel mt-6 bg-white rounded-lg shadow p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="finance-summary-grid grid grid-cols-3 gap-4">
                 <div>
                     <p class="text-sm text-gray-600">Total Payments</p>
                     <p class="text-2xl font-bold text-gray-900">K{{ number_format($payments->sum('amount'), 2) }}</p>

@@ -1,8 +1,9 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="max-width: 700px; margin: 30px auto; padding: 0 20px;">
-    <div style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management academic-form-page">
+    <div class="academic-header">
         <h1 style="margin: 0 0 0.5rem 0;">Add New Program</h1>
         <p style="margin: 0; color: #666;">Create a new academic program and optionally add courses</p>
     </div>
@@ -18,7 +19,7 @@
         </div>
     @endif
 
-    <form action="{{ route('programs.store') }}" method="POST" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form action="{{ route('programs.store') }}" method="POST" class="academic-surface">
         @csrf
 
         <div style="margin-bottom: 1.5rem;">
@@ -27,7 +28,7 @@
             <small style="color: #666; font-size: 0.875rem;">This will be used to match courses and students</small>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="academic-grid" style="margin-bottom: 1.5rem;">
             <div>
                 <label for="department" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Department/Faculty</label>
                 <input type="text" id="department" name="department" placeholder="e.g., Faculty of Science" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" value="{{ old('department') }}">
@@ -62,11 +63,11 @@
         </div>
 
         <!-- Buttons -->
-        <div style="display: flex; gap: 1rem;">
+        <div class="academic-actions academic-form-actions">
             <button type="submit" style="flex: 1; padding: 0.875rem; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 600;">
                 ✓ Create Program
             </button>
-            <a href="{{ route('programs.index') }}" style="flex: 1; padding: 0.875rem; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
+            <a href="{{ route('programs.index') }}" class="academic-secondary" style="flex: 1; padding: 0.875rem; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
                 × Cancel
             </a>
         </div>

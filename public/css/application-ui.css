@@ -1,0 +1,35 @@
+:root {
+    --phoenix-ink: #30283e;
+    --phoenix-muted: #645e70;
+    --phoenix-line: #e4dfec;
+    --phoenix-focus: #7043ad;
+}
+body { color:var(--phoenix-ink); }
+.phoenix-app-content { color:var(--phoenix-ink); }
+:where(.phoenix-app-content, .phoenix-module-content) :is(input, select, textarea) {
+    font-family:inherit;
+    max-width:100%;
+}
+:where(.phoenix-app-content, .phoenix-module-content) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select) {
+    min-height:42px;
+}
+:where(.phoenix-app-content, .phoenix-module-content) :is(button, a, input, select, textarea):focus-visible {
+    outline:3px solid var(--phoenix-focus);
+    outline-offset:3px;
+}
+:where(.phoenix-app-content, .phoenix-module-content) :is(input, select, textarea):disabled {
+    cursor:not-allowed;
+}
+:where(.phoenix-app-content, .phoenix-module-content) label { line-height:1.5; }
+:where(.phoenix-app-content, .phoenix-module-content) :is(th, td) { vertical-align:middle; }
+:where(.phoenix-app-content, .phoenix-module-content) :is(.alert, .badge) { line-height:1.5; }
+.phoenix-module-content { min-width:0; color:var(--phoenix-ink); }
+@media (prefers-reduced-motion:reduce) {
+    :where(.phoenix-app-content, .phoenix-module-content) *,
+    :where(.phoenix-app-content, .phoenix-module-content) *::before,
+    :where(.phoenix-app-content, .phoenix-module-content) *::after {
+        animation-duration:.01ms !important;
+        transition-duration:.01ms !important;
+        scroll-behavior:auto !important;
+    }
+}

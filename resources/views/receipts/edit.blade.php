@@ -1,7 +1,8 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="max-width: 800px; margin: 30px auto;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="max-width: 800px; margin: 30px auto;">
     <h2>Review Receipt - {{ $receipt->student->user->name }}</h2>
 
     @if(session('success'))
@@ -10,8 +11,8 @@
         </div>
     @endif
 
-    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+    <div class="finance-panel" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Student</h4>
                 <p style="font-size: 16px; font-weight: bold; color: #2c3e50;">{{ $receipt->student->user->name }}</p>
@@ -62,7 +63,7 @@
     </div>
 
     @if($receipt->status === 'pending')
-        <div style="display: flex; gap: 10px;">
+        <div class="finance-actions" style="display: flex; gap: 10px;">
             <form action="{{ route('receipts.approve', $receipt) }}" method="POST" style="flex: 1;">
                 @csrf
                 <button type="submit" class="btn-success" style="width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">✓ Approve Receipt</button>
@@ -73,7 +74,7 @@
             </form>
         </div>
     @else
-        <div style="display: flex; gap: 10px;">
+        <div class="finance-actions" style="display: flex; gap: 10px;">
             <a href="{{ route('receipts.index') }}" class="btn-secondary" style="flex: 1; padding: 12px; background: #95a5a6; color: white; text-decoration: none; border-radius: 4px; text-align: center; cursor: pointer; font-size: 16px;">Back to Receipts</a>
         </div>
     @endif

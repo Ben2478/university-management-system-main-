@@ -32,9 +32,12 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         $credentials = null;
+        $student = null;
 
         // Staff/management/lecturers login via email
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $user = User::where('email', Str::lower($identifier))->first();
+            $student = $user?->isStudent() ? $user->student : null;
             $credentials = [
                 'email' => Str::lower($identifier),
                 'password' => $validated['password'],
@@ -52,6 +55,12 @@ class AuthController extends Controller
                 'email' => $student->user->email,
                 'password' => $validated['password'],
             ];
+        }
+
+        if ($student?->isShortCourseExpired()) {
+            return back()->withErrors([
+                'identifier' => 'This short course has ended, and the student login is no longer active.',
+            ])->onlyInput('identifier');
         }
 
         if (Auth::attempt($credentials, $remember)) {

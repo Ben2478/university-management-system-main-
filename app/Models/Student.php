@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Student extends Model
 {
@@ -21,6 +22,7 @@ class Student extends Model
         'postal_code',
         'enrollment_date',
         'program',
+        'student_type',
         'status',
         'user_id',
         'parent_id',
@@ -74,6 +76,56 @@ class Student extends Model
     public function parent()
     {
         return $this->belongsTo(User::class, 'parent_id');
+    }
+
+    public function isShortCourse(): bool
+    {
+        return $this->student_type === 'short_course';
+    }
+
+    public function shortCourseTheoryEndsOn(): ?Carbon
+    {
+        return $this->isShortCourse() && $this->enrollment_date
+            ? $this->enrollment_date->copy()->addMonthNoOverflow()
+            : null;
+    }
+
+    public function shortCourseCompletesOn(): ?Carbon
+    {
+        return $this->isShortCourse() && $this->enrollment_date
+            ? $this->enrollment_date->copy()->addMonthsNoOverflow(3)
+            : null;
+    }
+
+    public function shortCoursePhase(?Carbon $date = null): ?string
+    {
+        if (!$this->isShortCourse()) {
+            return null;
+        }
+
+        $date = ($date ?? now())->copy()->startOfDay();
+        $theoryEndsOn = $this->shortCourseTheoryEndsOn()?->startOfDay();
+        $completesOn = $this->shortCourseCompletesOn()?->startOfDay();
+
+        if ($completesOn && $date->greaterThanOrEqualTo($completesOn)) {
+            return 'Completed';
+        }
+
+        return $theoryEndsOn && $date->greaterThanOrEqualTo($theoryEndsOn)
+            ? 'Practical'
+            : 'Theory';
+    }
+
+    public function isShortCourseExpired(?Carbon $date = null): bool
+    {
+        if (!$this->isShortCourse()) {
+            return false;
+        }
+
+        $completesOn = $this->shortCourseCompletesOn()?->startOfDay();
+
+        return $completesOn !== null
+            && ($date ?? now())->copy()->startOfDay()->greaterThanOrEqualTo($completesOn);
     }
 
     // Accessors

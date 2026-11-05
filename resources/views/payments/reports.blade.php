@@ -4,6 +4,7 @@
 
 @section('content')
 <style>
+    @scope (.finance-management) {
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -128,10 +129,12 @@
             grid-template-columns: 1fr;
         }
     }
+    }
 </style>
 
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management">
+    <div class="finance-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin-bottom: 0.5rem;">💰 Payment Analytics & Reports</h1>
             <p style="color: #7f8c8d; margin: 0;">Comprehensive revenue insights and payment trends</p>
@@ -239,6 +242,7 @@
             <div class="chart-header">
                 <div class="chart-title">🏆 Top 10 Paying Students</div>
             </div>
+            <div class="finance-table-scroll" tabindex="0" role="region" aria-label="Top paying students">
             <table class="table">
                 <thead>
                     <tr>
@@ -266,6 +270,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 

@@ -1,0 +1,259 @@
+.student-management {
+    --student-ink: #30283e;
+    --student-muted: #686174;
+    --student-border: #e4dfeb;
+    --student-violet: #7040a0;
+    --student-teal: #087c78;
+    --student-blue: #2867a8;
+    width: 100%;
+    max-width: 1440px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: var(--student-ink);
+    font-size: .9rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+}
+
+.student-management *,
+.student-management *::before,
+.student-management *::after {
+    box-sizing: border-box;
+    letter-spacing: 0;
+    min-width: 0;
+}
+
+.student-management.student-management-form { max-width: 960px; }
+.student-management .student-page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.student-management h1 { margin: 0; font-size: 1.55rem; line-height: 1.3; color: var(--student-ink); }
+.student-management h2 { margin: 0 0 1rem; font-size: 1.1rem; color: var(--student-ink); }
+.student-management .student-page-heading p { margin: .4rem 0 0; color: var(--student-muted); }
+.student-management a { color: var(--student-blue); }
+.student-management .student-back-link { display: inline-block; margin-bottom: .6rem; font-size: .85rem; text-decoration: none; }
+.student-management .student-back-link:hover { text-decoration: underline; }
+.student-management .student-actions,
+.student-management .button-group,
+.student-management .student-filter-actions,
+.student-management .quick-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .65rem;
+}
+.student-management .form-card {
+    padding: 1.5rem;
+    border: 1px solid var(--student-border);
+    border-top: 3px solid var(--student-violet);
+    border-radius: 8px;
+    background: #fff;
+}
+.student-management .form-row,
+.student-management .student-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 1.25rem;
+}
+.student-management .form-group { display: flex; flex-direction: column; margin-bottom: 1.1rem; }
+.student-management label { display: block; margin-bottom: .45rem; color: var(--student-ink); font-size: .85rem; font-weight: 600; }
+.student-management input,
+.student-management select,
+.student-management textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: .65rem .75rem;
+    border: 1px solid #c9c1d5;
+    border-radius: 5px;
+    background: #fff;
+    color: var(--student-ink);
+    font: inherit;
+}
+.student-management input[readonly] { color: var(--student-muted); background: #f6f4f9; }
+.student-management input:focus,
+.student-management select:focus,
+.student-management textarea:focus {
+    outline: 2px solid var(--student-violet);
+    outline-offset: 2px;
+    border-color: var(--student-violet);
+}
+.student-management small { display: block; margin-top: .4rem; line-height: 1.5; }
+.student-management .error { display: block; color: #ae2944; font-size: .8rem; margin-top: .35rem; }
+.student-management .alert { padding: 1rem; margin-bottom: 1.25rem; border-radius: 6px; }
+.student-management .alert-error { background: #fff0f3; color: #92253c; border: 1px solid #efbcc7; }
+.student-management .alert ul { padding-left: 1.25rem; }
+.student-management .button-group { margin-top: .5rem; padding-top: 1.25rem; border-top: 1px solid var(--student-border); }
+.student-management .btn,
+.student-management .action-btn,
+.student-management .quick-filter-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: .4rem;
+    max-width: 100%;
+    min-height: 42px;
+    padding: .6rem .95rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    text-align: center;
+    white-space: normal;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+    transform: none;
+    box-shadow: none;
+}
+.student-management .btn,
+.student-management .btn-primary,
+.student-management .action-btn.primary,
+.student-management .quick-filter-btn.active { color: #fff; background: var(--student-violet); border-color: var(--student-violet); }
+.student-management .btn:hover,
+.student-management .action-btn.primary:hover,
+.student-management .quick-filter-btn.active:hover { background: #593180; border-color: #593180; }
+.student-management .btn-secondary,
+.student-management .action-btn.secondary,
+.student-management .quick-filter-btn { color: #51425f; background: #f5f2f8; border-color: #dcd4e5; }
+.student-management .btn-secondary:hover,
+.student-management .action-btn.secondary:hover,
+.student-management .quick-filter-btn:hover { color: #51425f; background: #eae3f1; border-color: #b7a3cc; transform: none; }
+.student-management .btn-success,
+.student-management .action-btn.success { color: #fff; background: var(--student-teal); }
+.student-management .btn-success:hover,
+.student-management .action-btn.success:hover { background: #066460; border-color: #066460; }
+.student-management .btn-info { background: var(--student-blue); }
+.student-management .btn-warning { color: #653e0b; background: #fff1d9; border-color: #edcc93; }
+.student-management .btn-warning:hover { color: #653e0b; background: #fce4bc; border-color: #edcc93; }
+.student-management .btn-danger { background: #ae2944; }
+.student-management .btn-danger:hover { background: #8d2036; border-color: #8d2036; }
+.student-management :is(a, button):focus-visible { outline: 2px solid var(--student-blue); outline-offset: 3px; }
+.student-management .student-stats,
+.student-management .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.student-management .student-metric,
+.student-management .stat-card {
+    --student-tone: var(--student-violet);
+    padding: 1.1rem;
+    margin: 0;
+    border: 1px solid var(--student-border);
+    border-left: 4px solid var(--student-tone);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: none;
+    transform: none;
+}
+.student-management :is(.student-metric, .stat-card):nth-child(2) { --student-tone: var(--student-teal); }
+.student-management :is(.student-metric, .stat-card):nth-child(3) { --student-tone: var(--student-blue); }
+.student-management :is(.student-metric, .stat-card):nth-child(4) { --student-tone: #ae4867; }
+.student-management .student-metric p,
+.student-management .stat-label { margin: 0; color: var(--student-muted); font-size: .8rem; font-weight: 600; text-transform: none; }
+.student-management .student-metric h2,
+.student-management .student-metric .student-metric-value,
+.student-management .stat-value { display: block; margin: .5rem 0 0; color: var(--student-tone); font-size: 1.6rem; font-weight: 700; line-height: 1.25; }
+.student-management .stat-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.student-management .stat-icon { font-size: 1.25rem; }
+.student-management .stat-subtitle { margin-top: .5rem; color: var(--student-muted); font-size: .8rem; }
+.student-management .student-section,
+.student-management .student-filter-section {
+    margin: 0 0 1.5rem;
+    padding: 1.25rem 0;
+    border: 0;
+    border-top: 1px solid var(--student-border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.student-management .filter-section { margin-bottom: 1.5rem; border: 1px solid var(--student-border); border-radius: 6px; overflow: hidden; }
+.student-management .filter-header { display: flex; justify-content: space-between; align-items: center; gap: .75rem; width: 100%; padding: 1rem; border: 0; background: #f5f2f8; color: var(--student-ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.student-management .filter-content { display: none; padding: 1rem; background: #fff; }
+.student-management .filter-content.active { display: block; }
+.student-management .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 1rem; }
+.student-management .filter-grid .form-group { margin-bottom: 0; }
+.student-management .student-filter-actions { margin-top: 1rem; }
+.student-management .quick-filters { margin-bottom: 1.25rem; }
+.student-management .student-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--student-border);
+    border-radius: 6px;
+    background: #fff;
+}
+.student-management table { width: 100%; min-width: 720px; margin: 0; border-collapse: collapse; font-size: .85rem; }
+.student-management .student-financial-table { min-width: 1140px; }
+.student-management th { padding: .85rem 1rem; background: #f5f2f8; color: #5e526e; text-align: left; font-size: .75rem; font-weight: 700; border-bottom: 1px solid var(--student-border); white-space: nowrap; }
+.student-management td { padding: .85rem 1rem; border-bottom: 1px solid #eeebf2; vertical-align: middle; }
+.student-management tbody tr:hover { background: #faf8fc; }
+.student-management tr:last-child td { border-bottom: 0; }
+.student-management .student-row-actions { display: flex; flex-wrap: wrap; gap: .5rem; min-width: 210px; }
+.student-management .student-row-actions .btn { padding: .5rem .7rem; font-size: .8rem; }
+.student-management .status-badge,
+.student-management .financial-badge,
+.student-management .badge { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .55rem; border-radius: 4px; background: #f0edf5; color: #5e526e; font-size: .75rem; font-weight: 600; }
+.student-management .status-badge.active,
+.student-management .financial-badge.paid,
+.student-management .badge-success { background: #e1f4ef; color: #146653; }
+.student-management .status-badge.inactive { background: #eeedf0; color: #5f5966; }
+.student-management .status-badge.graduated,
+.student-management .badge-info { background: #e7effb; color: #275b94; }
+.student-management .status-badge.suspended,
+.student-management .badge-danger { background: #fce8ed; color: #9c2a43; }
+.student-management .financial-badge.owing,
+.student-management .badge-warning { background: #fff1d9; color: #805215; }
+.student-management .empty-state { padding: 2.5rem 1rem; text-align: center; color: var(--student-muted); }
+.student-management .empty-state-icon { font-size: 2rem; margin-bottom: .5rem; }
+.student-management .student-pagination { display: flex; justify-content: center; max-width: 100%; margin-top: 1.25rem; overflow-x: auto; }
+.student-management .student-pagination svg { width: 20px; height: 20px; }
+.student-management .student-info-grid p { margin: 0 0 .85rem; }
+.student-management .student-credentials { padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #abd7ca; border-left: 4px solid var(--student-teal); border-radius: 6px; background: #edf8f4; color: #225d4b; }
+.student-management .student-credentials h3 { margin: 0 0 .75rem; font-size: 1rem; }
+.student-management .student-credentials-details { padding: .5rem 0; border-top: 1px solid #abd7ca; border-bottom: 1px solid #abd7ca; }
+.student-management code { white-space: normal; overflow-wrap: anywhere; }
+
+@media (max-width: 1100px) {
+    .student-management .student-stats,
+    .student-management .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+    .student-management { padding: 1rem; }
+    .student-management h1 { font-size: 1.3rem; }
+    .student-management .student-page-heading { align-items: flex-start; flex-direction: column; }
+    .student-management .form-card { padding: 1rem; }
+    .student-management .form-row,
+    .student-management .student-info-grid,
+    .student-management .filter-grid { grid-template-columns: minmax(0, 1fr); }
+    .student-management .button-group { display: grid; grid-template-columns: minmax(0, 1fr); }
+    .student-management .button-group .btn { width: 100%; }
+    .student-management .student-metric,
+    .student-management .stat-card { padding: .85rem; }
+    .student-management .student-metric h2,
+    .student-management .student-metric .student-metric-value,
+    .student-management .stat-value { font-size: 1.3rem; }
+    .student-management .quick-filter-btn { flex: 1 1 140px; }
+    .student-management input,
+    .student-management select,
+    .student-management textarea { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .student-management .btn,
+    .student-management .action-btn,
+    .student-management .quick-filter-btn { transition: none; }
+}

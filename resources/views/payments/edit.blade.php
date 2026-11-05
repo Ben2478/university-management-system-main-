@@ -1,7 +1,8 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="max-width: 600px; margin: 30px auto;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="max-width: 600px; margin: 30px auto;">
     <h2>Edit Payment</h2>
 
     @if($errors->any())
@@ -14,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('payments.update', $payment) }}" method="POST" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form class="finance-panel" action="{{ route('payments.update', $payment) }}" method="POST" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         @csrf
         @method('PUT')
 
@@ -61,7 +62,7 @@
             <textarea id="description" name="description" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">{{ $payment->description }}</textarea>
         </div>
 
-        <div style="display: flex; gap: 10px;">
+        <div class="finance-actions" style="display: flex; gap: 10px;">
             <button type="submit" class="btn-success" style="flex: 1; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Update Payment</button>
             <a href="{{ route('payments.index') }}" class="btn-secondary" style="flex: 1; padding: 12px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 16px;">Cancel</a>
         </div>

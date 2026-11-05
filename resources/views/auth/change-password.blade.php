@@ -60,8 +60,9 @@
         .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
         .hint { margin-top: .75rem; color:#666; font-size: .9rem; }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/authentication.css') }}?v={{ filemtime(public_path('css/authentication.css')) }}">
 </head>
-<body>
+<body class="authentication">
     <div class="card">
         <div class="header">
             <h1>Change your password</h1>

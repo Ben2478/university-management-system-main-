@@ -4,6 +4,23 @@
 
 @section('content')
 <style>
+    .accountant-dashboard { padding-top:1.5rem !important; color:#272336; }
+    .accountant-dashboard > .container { max-width:100%; }
+    .accountant-dashboard-heading { margin-bottom:1.5rem !important; }
+    .accountant-dashboard-heading h1 { font-size:1.45rem; line-height:1.25; }
+    .accountant-dashboard .stats-grid { grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:.85rem; margin-bottom:1.5rem; }
+    .accountant-dashboard .stat-card, .accountant-dashboard .chart-card, .accountant-dashboard .action-btn { border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .accountant-dashboard .stat-card { border-left:4px solid; }
+    .accountant-dashboard .chart-grid { grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr); gap:1rem; margin-bottom:1.25rem; }
+    .accountant-dashboard .chart-card { min-width:0; overflow-x:auto; padding:1.1rem; }
+    .accountant-dashboard .chart-header { gap:.75rem; }
+    .accountant-dashboard .chart-title { line-height:1.35; }
+    .accountant-dashboard .chart-card canvas { display:block; width:100% !important; height:250px !important; max-height:250px !important; }
+    .accountant-dashboard .table { min-width:620px; }
+    .accountant-dashboard .quick-actions { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:.85rem; margin-bottom:1.5rem; }
+    .accountant-dashboard .action-btn { padding:1.1rem; }
+    .accountant-dashboard .alert-box { border-radius:.6rem; }
+
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -173,21 +190,34 @@
     }
     
     @media (max-width: 768px) {
+        .accountant-dashboard { padding-top:1rem !important; }
         .chart-grid {
             grid-template-columns: 1fr;
         }
         .stats-grid {
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         }
+        .accountant-dashboard .chart-grid { grid-template-columns:minmax(0,1fr); gap:.8rem; }
+        .accountant-dashboard .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+        .accountant-dashboard .stat-card { padding:1rem; }
+        .accountant-dashboard .stat-value { font-size:1.45rem; overflow-wrap:anywhere; }
+        .accountant-dashboard .quick-actions { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+        .accountant-dashboard .action-btn { padding:.9rem .65rem; }
+        .accountant-dashboard .action-icon { font-size:1.55rem; }
+        .accountant-dashboard .chart-header { align-items:flex-start; }
+        .accountant-dashboard .chart-title { font-size:.92rem; }
+        .accountant-dashboard .chart-card canvas { height:225px !important; max-height:225px !important; }
+    }
+    @media (max-width:420px) {
+        .accountant-dashboard .stats-grid { grid-template-columns:1fr 1fr; }
+        .accountant-dashboard .quick-actions { grid-template-columns:1fr 1fr; }
+        .accountant-dashboard .badge { white-space:nowrap; }
     }
 </style>
 
-<div class="container">
+<div class="container accountant-dashboard dashboard-workspace" data-dashboard="accountant">
     <!-- Header -->
-    <div style="margin-bottom: 2rem;">
-        <h1 style="margin-bottom: 0.5rem;">💼 Accountant Dashboard Overview</h1>
-        <p style="color: #7f8c8d; margin: 0;">Welcome back! Here's your financial summary for today</p>
-    </div>
+    @include('components.dashboard-heading', ['area' => 'Finance workspace', 'title' => 'Financial overview', 'description' => 'Welcome back, ' . auth()->user()->name . '.'])
 
     <!-- Alerts -->
     @if(isset($alerts) && count($alerts) > 0)
@@ -203,43 +233,14 @@
     @endif
 
     <!-- Key Stats -->
-    <div class="stats-grid">
-        <div class="stat-card danger">
-            <div class="stat-label">Pending Reviews</div>
-            <div class="stat-value">{{ $stats['pending_receipts'] }}</div>
-            <div class="stat-subtext">ZMW {{ number_format($stats['pending_amount'], 0) }}</div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-label">Today's Revenue</div>
-            <div class="stat-value">ZMW {{ number_format($stats['today_revenue'], 0) }}</div>
-            <div class="stat-subtext">{{ $stats['approved_today'] }} receipts approved</div>
-        </div>
-
-        <div class="stat-card primary">
-            <div class="stat-label">Total Collected</div>
-            <div class="stat-value">ZMW {{ number_format($stats['total_collected'], 0) }}</div>
-            <div class="stat-subtext">{{ $stats['total_students'] }} students</div>
-        </div>
-
-        <div class="stat-card warning">
-            <div class="stat-label">Outstanding Balance</div>
-            <div class="stat-value">ZMW {{ number_format($stats['outstanding_balance'], 0) }}</div>
-            <div class="stat-subtext">{{ $stats['students_with_balance'] }} students owing</div>
-        </div>
-
-        <div class="stat-card info">
-            <div class="stat-label">This Month</div>
-            <div class="stat-value">ZMW {{ number_format($stats['this_month_revenue'], 0) }}</div>
-            <div class="stat-subtext">{{ $stats['approval_rate'] }}% approval rate</div>
-        </div>
-
-        <div class="stat-card success">
-            <div class="stat-label">Fully Paid</div>
-            <div class="stat-value">{{ $stats['fully_paid'] }}</div>
-            <div class="stat-subtext">{{ round(($stats['fully_paid']/$stats['total_students'])*100, 1) }}% of students</div>
-        </div>
-    </div>
+    @include('components.dashboard-metrics', ['metrics' => [
+        ['label' => 'Pending Reviews', 'value' => $stats['pending_receipts'], 'detail' => 'ZMW ' . number_format($stats['pending_amount'], 0) . ' awaiting review', 'icon' => 'receipts', 'tone' => 'rose'],
+        ['label' => "Today's Revenue", 'value' => 'ZMW ' . number_format($stats['today_revenue'], 0), 'detail' => $stats['approved_today'] . ' receipts approved today', 'icon' => 'payments', 'tone' => 'green'],
+        ['label' => 'Total Collected', 'value' => 'ZMW ' . number_format($stats['total_collected'], 0), 'detail' => $stats['total_students'] . ' students', 'icon' => 'finance'],
+        ['label' => 'Outstanding Balance', 'value' => 'ZMW ' . number_format($stats['outstanding_balance'], 0), 'detail' => $stats['students_with_balance'] . ' students owing', 'icon' => 'reports', 'tone' => 'amber'],
+        ['label' => 'This Month', 'value' => 'ZMW ' . number_format($stats['this_month_revenue'], 0), 'detail' => $stats['approval_rate'] . '% approval rate', 'icon' => 'calendar', 'tone' => 'blue'],
+        ['label' => 'Fully Paid', 'value' => $stats['fully_paid'], 'detail' => ($stats['total_students'] > 0 ? round($stats['fully_paid'] / $stats['total_students'] * 100, 1) : 0) . '% of students', 'icon' => 'attendance', 'tone' => 'green'],
+    ]])
 
     <!-- Quick Actions -->
     <div class="quick-actions">
@@ -275,14 +276,14 @@
                 <div class="chart-title">📈 Daily Revenue Trend (Last 7 Days)</div>
                 <span class="badge success">ZMW {{ number_format(array_sum($daily_revenue), 0) }}</span>
             </div>
-            <canvas id="dailyRevenueChart" style="max-height: 250px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'dailyRevenueChart', 'label' => 'Daily revenue for the last seven days', 'hasData' => collect($daily_revenue)->contains(fn ($amount) => (float) $amount !== 0.0), 'emptyMessage' => 'No completed payments in the last seven days.'])
         </div>
 
         <div class="chart-card">
             <div class="chart-header">
                 <div class="chart-title">💳 Revenue by Method</div>
             </div>
-            <canvas id="methodPieChart" style="max-height: 200px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'methodPieChart', 'label' => 'Revenue by payment method', 'hasData' => array_sum($revenue_by_method) != 0, 'emptyMessage' => 'No completed payments by method yet.'])
             <div class="method-list">
                 @foreach($revenue_by_method as $method => $amount)
                 <div class="method-item">
@@ -300,7 +301,7 @@
             <div class="chart-header">
                 <div class="chart-title">📋 Receipt Status Breakdown</div>
             </div>
-            <canvas id="receiptStatusChart" style="max-height: 250px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'receiptStatusChart', 'label' => 'Receipt status breakdown', 'hasData' => array_sum($receipt_status) > 0, 'emptyMessage' => 'No receipts have been submitted yet.'])
             <div class="method-list">
                 @foreach($receipt_status as $status => $count)
                 <div class="method-item">
@@ -315,7 +316,7 @@
             <div class="chart-header">
                 <div class="chart-title">🎓 Students Owing by Program</div>
             </div>
-            <canvas id="owingProgramChart" style="max-height: 250px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'owingProgramChart', 'label' => 'Students owing by programme', 'hasData' => $owing_by_program->sum() > 0, 'emptyMessage' => 'No outstanding student balances by programme.'])
             @if($owing_by_program->count() > 0)
             <div class="method-list">
                 @foreach($owing_by_program as $program => $count)
@@ -415,7 +416,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Daily Revenue Chart
-    new Chart(document.getElementById('dailyRevenueChart'), {
+    renderDashboardChart('dailyRevenueChart', {
         type: 'line',
         data: {
             labels: @json($daily_labels),
@@ -447,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Payment Method Pie Chart
-    new Chart(document.getElementById('methodPieChart'), {
+    renderDashboardChart('methodPieChart', {
         type: 'doughnut',
         data: {
             labels: @json(array_keys($revenue_by_method)),
@@ -464,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Receipt Status Chart
-    new Chart(document.getElementById('receiptStatusChart'), {
+    renderDashboardChart('receiptStatusChart', {
         type: 'bar',
         data: {
             labels: @json(array_keys($receipt_status)),
@@ -488,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Owing by Program Chart
-    new Chart(document.getElementById('owingProgramChart'), {
+    renderDashboardChart('owingProgramChart', {
         type: 'bar',
         data: {
             labels: @json($owing_by_program->keys()->toArray()),

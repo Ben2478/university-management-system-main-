@@ -1,18 +1,19 @@
 @extends('layouts.super-admin')
 
 @section('content')
-<div class="container" style="max-width: 1000px; margin: 30px auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom: 1.25rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="max-width: 1000px; margin: 30px auto;">
+    <div class="ops-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom: 1.25rem;">
         <div>
             <h2 style="margin:0 0 .25rem 0;">{{ $lecturer->full_name }}</h2>
             <div style="color:#666;">{{ $lecturer->lecturer_code }} • {{ $lecturer->email }}</div>
         </div>
-        <div style="display:flex; gap:.5rem;">
-            <a href="{{ route('lecturers.edit', $lecturer) }}" style="padding:.6rem .9rem; background:#f39c12; color:#fff; border-radius:.35rem; text-decoration:none; font-weight:800;">Edit</a>
+        <div class="ops-actions">
+            <a href="{{ route('lecturers.edit', $lecturer) }}" class="btn btn-warning">Edit</a>
             <form action="{{ route('lecturers.destroy', $lecturer) }}" method="POST" onsubmit="return confirm('Delete this lecturer?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" style="padding:.6rem .9rem; background:#e74c3c; color:#fff; border:none; border-radius:.35rem; cursor:pointer; font-weight:800;">Delete</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </div>
     </div>
@@ -34,7 +35,7 @@
     @endif
 
     <div class="card" style="padding: 1.5rem;">
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+        <div class="ops-grid">
             <div>
                 <div style="color:#666; font-weight:700; font-size:.85rem;">School</div>
                 <div style="font-weight:800; color:#2c3e50;">{{ $lecturer->school_code ? (($schools[$lecturer->school_code] ?? 'School') . ' (' . $lecturer->school_code . ')') : 'N/A' }}</div>
@@ -70,6 +71,6 @@
         </div>
     </div>
 
-    <a href="{{ route('lecturers.index') }}" style="display:inline-block; margin-top: 1rem; padding:.6rem .9rem; background:#95a5a6; color:#fff; border-radius:.35rem; text-decoration:none; font-weight:800;">Back</a>
+    <a href="{{ route('lecturers.index') }}" class="btn btn-secondary" style="margin-top: 1rem;">Back</a>
 </div>
 @endsection

@@ -1,11 +1,12 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
-<div class="container" style="max-width: 800px; margin: 30px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+<link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
+<div class="container academic-records records-detail-page">
+    <div class="records-header">
         <h2>Attendance Record</h2>
         @if(!auth()->user()->isStudent() && !auth()->user()->isParent())
-            <div style="display: flex; gap: 10px;">
+            <div class="records-actions">
                 <a href="{{ route('attendance.edit', $attendance) }}" class="btn-primary" style="padding: 10px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 4px;">Edit</a>
                 <form action="{{ route('attendance.destroy', $attendance) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?');">
                     @csrf
@@ -16,8 +17,8 @@
         @endif
     </div>
 
-    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="records-surface">
+        <div class="records-grid">
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Student</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $attendance->student->user->name }}</p>
@@ -41,7 +42,7 @@
                             'excused' => '#3498db'
                         ];
                     @endphp
-                    <span style="padding: 5px 10px; background: {{ $statusColors[$attendance->status] ?? '#95a5a6' }}; color: white; border-radius: 4px; text-transform: capitalize;">{{ $attendance->status }}</span>
+                    <span class="status-badge status-{{ $attendance->status }}" style="padding: 5px 10px; background: {{ $statusColors[$attendance->status] ?? '#95a5a6' }}; color: white; border-radius: 4px; text-transform: capitalize;">{{ $attendance->status }}</span>
                 </p>
             </div>
         </div>

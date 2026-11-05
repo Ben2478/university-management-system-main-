@@ -1,8 +1,9 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="padding: 2rem 0;">
+    <div class="ops-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">Available Courses</h1>
             <p style="margin: 0; color: #666;">Browse and enroll in courses for your program: <strong>{{ $student->program }}</strong></p>
@@ -24,17 +25,33 @@
     </div>
     @endif
 
+    <form method="GET" action="{{ route('enrollments.available') }}" class="ops-flex" style="display: flex; align-items: end; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div>
+            <label for="term" style="display: block; margin-bottom: 0.4rem; font-weight: 600;">Term</label>
+            <select id="term" name="term" style="min-width: 180px; padding: 0.65rem; border: 1px solid #ccc; border-radius: 4px; background: white;">
+                <option value="">All Terms</option>
+                @for($term = 1; $term <= 3; $term++)
+                    <option value="{{ $term }}" {{ (string) request('term') === (string) $term ? 'selected' : '' }}>Term {{ $term }}</option>
+                @endfor
+            </select>
+        </div>
+        <button type="submit" class="btn" style="padding: 0.65rem 1rem; background: #3498db; color: white; border: 0; border-radius: 4px; cursor: pointer;">Filter</button>
+        @if(request()->filled('term'))
+            <a href="{{ route('enrollments.available') }}" style="padding: 0.65rem 1rem; color: #555;">Clear</a>
+        @endif
+    </form>
+
     @if($availableCourses->count() > 0)
     <div style="display: grid; gap: 1.5rem;">
         @foreach($availableCourses as $course)
         <div class="card" style="border-left: 4px solid #3498db;">
-            <div style="display: flex; justify-content: space-between; align-items: start; gap: 2rem;">
+            <div class="ops-flex" style="display: flex; justify-content: space-between; align-items: start; gap: 2rem;">
                 <!-- Course Info -->
                 <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="ops-flex" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
                         <h3 style="margin: 0; color: #2c3e50;">{{ $course->course_code }}</h3>
                         <span style="padding: 0.25rem 0.75rem; background: #e3f2fd; color: #1976d2; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">
-                            Semester {{ $course->semester }}
+                            {{ $course->term ? 'Term ' . $course->term : 'Term not set' }}
                         </span>
                         <span style="padding: 0.25rem 0.75rem; background: #f3e5f5; color: #7b1fa2; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">
                             {{ $course->credits }} Credits
@@ -66,7 +83,7 @@
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
                     <form action="{{ route('enrollments.enroll', $course) }}" method="POST" onsubmit="return confirm('Are you sure you want to enroll in {{ $course->course_code }}?');">
                         @csrf
-                        <button type="submit" class="btn" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 1rem; font-weight: 600; white-space: nowrap;">
+                        <button type="submit" class="btn btn-success" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 1rem; font-weight: 600; white-space: nowrap;">
                             ✓ Enroll Now
                         </button>
                     </form>
@@ -87,7 +104,9 @@
     <div class="card" style="text-align: center; padding: 3rem;">
         <p style="color: #999; font-size: 1.125rem; margin-bottom: 1rem;">📚 No courses available</p>
         <p style="color: #666; font-size: 0.875rem; margin-bottom: 1.5rem;">
-            @if($student->program)
+            @if(request()->filled('term'))
+                No available courses for Term {{ request('term') }} in <strong>{{ $student->program }}</strong>.
+            @elseif($student->program)
                 All available courses for <strong>{{ $student->program }}</strong> have been enrolled or are inactive.
             @else
                 Your program is not set. Contact your academic advisor.

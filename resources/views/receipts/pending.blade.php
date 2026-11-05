@@ -1,7 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="padding: 2rem 0;">
     <div style="margin-bottom: 2rem;">
         <a href="{{ route('receipts.pending') }}" style="color: #3498db; text-decoration: none; font-weight: 600;">
             ← Back to Pending Reviews
@@ -23,7 +24,7 @@
     @endif
 
     <!-- Receipt Preview and Details Grid -->
-    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <div class="finance-detail-grid" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 2rem;">
         <!-- Left: Receipt Preview -->
         <div class="card" style="border-left: 4px solid #3498db;">
             <h3 style="margin: 0 0 1rem 0; color: #2c3e50;">📄 Receipt Document</h3>
@@ -135,7 +136,7 @@
 
     <!-- Action Forms -->
     @if($receipt->isPending())
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <!-- Approve Form -->
             <div class="card" style="background: linear-gradient(135deg, #d4edda, #c3e6cb); border-left: 4px solid #27ae60;">
                 <h3 style="color: #155724; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
@@ -203,7 +204,7 @@
         <!-- Action Guidelines -->
         <div class="card" style="margin-top: 2rem; background: #e8f4f8; border-left: 4px solid #3498db;">
             <h3 style="margin: 0 0 1rem 0; color: #2c3e50;">📋 Review Guidelines</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                 <div>
                     <h4 style="margin: 0 0 0.5rem 0; color: #27ae60;">✓ Approve if:</h4>
                     <ul style="margin: 0; padding-left: 1.5rem; color: #555; line-height: 1.8;">

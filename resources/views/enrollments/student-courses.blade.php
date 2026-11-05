@@ -1,8 +1,9 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="padding: 2rem 0;">
+    <div class="ops-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">My Courses</h1>
             <p style="margin: 0; color: #666;">Student ID: {{ $student->student_id }} • {{ $student->program }} - Year {{ $student->year }}, Semester {{ $student->semester }}</p>
@@ -19,7 +20,7 @@
     @endif
 
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="ops-stats">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase;">Total Courses</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['total'] }}</h2>
@@ -47,7 +48,7 @@
             {{ $data['status_color'] === 'success' ? '#27ae60' : ($data['status_color'] === 'warning' ? '#f39c12' : '#e74c3c') }};">
             
             <!-- Course Header -->
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+            <div class="ops-flex" style="justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
                 <div>
                     <h3 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ $data['course']->course_code }} - {{ $data['course']->course_name }}</h3>
                     <p style="margin: 0; color: #666; font-size: 0.875rem;">
@@ -69,7 +70,7 @@
             </div>
 
             <!-- Performance Metrics -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
+            <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
                 <!-- Current Grade -->
                 <div>
                     <p style="margin: 0 0 0.5rem 0; color: #666; font-size: 0.75rem; text-transform: uppercase;">Current Grade</p>
@@ -141,7 +142,7 @@
     <!-- Completed Courses -->
     @if($completedCourses->count() > 0)
     <h2 style="margin: 2rem 0 1.5rem 0; color: #2c3e50;">Completed Courses ({{ $completedCourses->count() }})</h2>
-    <div class="card">
+    <div class="card ops-table-scroll" role="region" aria-label="Completed courses" tabindex="0">
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="border-bottom: 2px solid #ddd;">

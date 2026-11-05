@@ -1,320 +1,15 @@
 @extends(auth()->user()->isSuperAdmin() ? 'layouts.super-admin' : 'layouts.admin')
 
 @section('content')
-<style>
-    .card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-left: 4px solid;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    }
-    
-    .stat-card.blue { 
-        border-left-color: #3b82f6; 
-        background: linear-gradient(135deg, #ffffff, #dbeafe);
-    }
-    .stat-card.green { 
-        border-left-color: #10b981; 
-        background: linear-gradient(135deg, #ffffff, #d1fae5);
-    }
-    .stat-card.orange { 
-        border-left-color: #f59e0b; 
-        background: linear-gradient(135deg, #ffffff, #fef3c7);
-    }
-    .stat-card.red { 
-        border-left-color: #ef4444; 
-        background: linear-gradient(135deg, #ffffff, #fee2e2);
-    }
-    
-    .stat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0.75rem;
-    }
-    
-    .stat-icon {
-        font-size: 2rem;
-        opacity: 0.8;
-    }
-    
-    .stat-label { 
-        color: #6b7280; 
-        font-size: 0.75rem; 
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-    }
-    
-    .stat-value { 
-        font-size: 2rem; 
-        font-weight: 800; 
-        color: #111827;
-        line-height: 1;
-        margin: 0.5rem 0;
-    }
-    
-    .stat-subtitle { 
-        color: #6b7280; 
-        font-size: 0.875rem; 
-        margin-top: 0.5rem;
-    }
-    
-    .quick-filters {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.5rem;
-    }
-    
-    .quick-filter-btn {
-        padding: 0.625rem 1.25rem;
-        border-radius: 0.5rem;
-        border: 2px solid #e5e7eb;
-        background: white;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 0.875rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .quick-filter-btn:hover {
-        border-color: #3b82f6;
-        background: #eff6ff;
-        transform: translateY(-1px);
-    }
-    
-    .quick-filter-btn.active {
-        background: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
-    
-    .filter-section {
-        background: white;
-        padding: 0;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-    }
-    
-    .filter-header {
-        padding: 1rem 1.5rem;
-        background: #f9fafb;
-        border-bottom: 1px solid #e5e7eb;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 600;
-        color: #374151;
-    }
-    
-    .filter-header:hover {
-        background: #f3f4f6;
-    }
-    
-    .filter-content {
-        padding: 1.5rem;
-        display: none;
-    }
-    
-    .filter-content.active {
-        display: block;
-    }
-    
-    .filter-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .form-group label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-group input,
-    .form-group select {
-        padding: 0.625rem 0.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        transition: border-color 0.2s;
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus {
-        outline: none;
-        border-color: #3b82f6;
-    }
-    
-    .student-table {
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-    
-    .student-table table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .student-table th {
-        background: #f9fafb;
-        padding: 1rem;
-        text-align: left;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-bottom: 2px solid #e5e7eb;
-    }
-    
-    .student-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    
-    .student-table tr:hover {
-        background: #f9fafb;
-    }
-    
-    .student-table tr:last-child td {
-        border-bottom: none;
-    }
-    
-    .status-badge {
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-    }
-    
-    .status-badge.active {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    
-    .status-badge.inactive {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-    
-    .financial-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .financial-badge.paid {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    
-    .financial-badge.owing {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    
-    .action-btn {
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-        display: inline-block;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .action-btn.primary {
-        background: #3b82f6;
-        color: white;
-    }
-    
-    .action-btn.primary:hover {
-        background: #2563eb;
-    }
-    
-    .action-btn.secondary {
-        background: #f3f4f6;
-        color: #374151;
-    }
-    
-    .action-btn.secondary:hover {
-        background: #e5e7eb;
-    }
-    
-    .action-btn.success {
-        background: #10b981;
-        color: white;
-    }
-    
-    .action-btn.success:hover {
-        background: #059669;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6b7280;
-    }
-    
-    .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/student-management.css') }}">
 
-<div style="margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+<div class="student-management">
+    <div class="student-page-heading">
         <div>
-            <h1 style="font-size: 1.875rem; font-weight: 800; color: #111827; margin: 0;">💰 Student Financial Records</h1>
-            <p style="color: #6b7280; margin: 0.5rem 0 0 0;">View student information and financial status</p>
+            <h1>Student Financial Records</h1>
+            <p>View student information and financial status</p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
+        <div class="student-actions">
             <a href="{{ route('students.export') }}" class="action-btn success">
                 📊 Export Financial Report
             </a>
@@ -395,21 +90,21 @@
 
     <!-- Advanced Filters (Collapsible) -->
     <div class="filter-section">
-        <div class="filter-header" onclick="toggleFilters()">
+        <button type="button" class="filter-header" aria-controls="filter-content" onclick="toggleFilters()">
             <span>🔍 Search & Filters</span>
             <span id="filter-toggle">▼</span>
-        </div>
+        </button>
         <div class="filter-content" id="filter-content">
             <form method="GET" action="{{ route('students.index') }}">
                 <div class="filter-grid">
                     <div class="form-group">
-                        <label>🔎 Search</label>
-                        <input type="text" name="search" value="{{ request('search') }}" 
+                        <label for="student-search">🔎 Search</label>
+                           <input id="student-search" type="text" name="search" value="{{ request('search') }}"
                                placeholder="Name, Email, or Student ID...">
                     </div>
                     <div class="form-group">
-                        <label>🎓 Program</label>
-                        <select name="program">
+                        <label for="student-program">🎓 Program</label>
+                        <select id="student-program" name="program">
                             <option value="">All Programs</option>
                             @foreach($programs as $program)
                                 <option value="{{ $program }}" {{ request('program') == $program ? 'selected' : '' }}>{{ $program }}</option>
@@ -417,8 +112,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>📚 Year</label>
-                        <select name="year">
+                        <label for="student-year">📚 Year</label>
+                        <select id="student-year" name="year">
                             <option value="">All Years</option>
                             @for($i = 1; $i <= 5; $i++)
                                 <option value="{{ $i }}" {{ request('year') == $i ? 'selected' : '' }}>Year {{ $i }}</option>
@@ -426,23 +121,23 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>📅 Semester</label>
-                        <select name="semester">
+                        <label for="student-semester">📅 Semester</label>
+                        <select id="student-semester" name="semester">
                             <option value="">All Semesters</option>
                             <option value="1" {{ request('semester') == '1' ? 'selected' : '' }}>Semester 1</option>
                             <option value="2" {{ request('semester') == '2' ? 'selected' : '' }}>Semester 2</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>💰 Financial Status</label>
-                        <select name="financial_status">
+                        <label for="student-financial-status">💰 Financial Status</label>
+                        <select id="student-financial-status" name="financial_status">
                             <option value="">All Statuses</option>
                             <option value="owing" {{ request('financial_status') == 'owing' ? 'selected' : '' }}>Owing Balance</option>
                             <option value="paid" {{ request('financial_status') == 'paid' ? 'selected' : '' }}>Fully Paid</option>
                         </select>
                     </div>
                 </div>
-                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                <div class="student-filter-actions">
                     <button type="submit" class="action-btn primary">
                         Apply Filters
                     </button>
@@ -457,7 +152,8 @@
     <!-- Students Table -->
     <div class="student-table">
         @if($students->count() > 0)
-            <table>
+            <div class="student-table-scroll" role="region" aria-label="Student financial records" tabindex="0">
+            <table class="student-financial-table">
                 <thead>
                     <tr>
                         <th>Student ID</th>
@@ -551,6 +247,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <div class="empty-state">
                 <div class="empty-state-icon">👥</div>
@@ -574,7 +271,7 @@
     </div>
 
     @if($students->hasPages())
-        <div style="margin-top: 1.5rem; display: flex; justify-content: center;">
+        <div class="student-pagination">
             {{ $students->links() }}
         </div>
     @endif

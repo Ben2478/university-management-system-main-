@@ -1,16 +1,54 @@
 @extends('layouts.super-admin')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
+<style>
+    .super-dashboard { padding-top: 1.5rem !important; }
+    .super-dashboard-heading { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; }
+    .super-dashboard-heading h1 { font-size:1.55rem; line-height:1.25; }
+    .super-dashboard-period { display:flex; align-items:center; gap:.6rem; color:#746d81; font-size:.82rem; }
+    .super-dashboard-period label { white-space:nowrap; }
+    .super-dashboard-period select { width:auto; min-width:150px; }
+    .super-dashboard-actions { display:flex; flex-wrap:wrap; gap:.65rem; margin-bottom:1.5rem; }
+    .super-dashboard-actions .btn { min-height:42px; display:inline-flex; align-items:center; gap:.5rem; border-radius:.55rem; }
+    .super-dashboard-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:.85rem; margin-bottom:1.5rem; }
+    .super-dashboard-stat { min-width:0; margin:0; padding:1.1rem; border:1px solid #e8e5ee; border-left:4px solid var(--stat-color); border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .super-dashboard-stat h2 { font-size:1.8rem !important; overflow-wrap:anywhere; }
+    .super-dashboard-charts { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr); gap:1rem; margin-bottom:1.25rem; }
+    .super-dashboard-chart-card { min-width:0; margin:0; padding:1.1rem; border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .super-dashboard-chart-card h3, .super-dashboard-panel h3 { font-size:.98rem; }
+    .super-dashboard-chart-card canvas { display:block; width:100% !important; height:270px !important; max-height:270px !important; }
+    .super-dashboard-lower { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start; gap:1rem; }
+    .super-dashboard-panel { min-width:0; margin:0; padding:1.1rem; border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .super-dashboard-panel table { min-width:280px; }
+    @media (max-width:1050px) {
+        .super-dashboard-charts { grid-template-columns:minmax(0,1.3fr) minmax(240px,1fr); }
+        .super-dashboard-lower { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .super-dashboard-panel:first-child { grid-column:1/-1; }
+    }
+    @media (max-width:700px) {
+        .super-dashboard { padding-top:1rem !important; }
+        .super-dashboard-heading { align-items:stretch; flex-direction:column; }
+        .super-dashboard-heading h1 { font-size:1.3rem; }
+        .super-dashboard-period { justify-content:space-between; }
+        .super-dashboard-period select { flex:1; }
+        .super-dashboard-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .super-dashboard-actions .btn { justify-content:center; padding:.6rem .5rem; text-align:center; }
+        .super-dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+        .super-dashboard-stat { padding:.85rem; }
+        .super-dashboard-stat h2 { font-size:1.45rem !important; }
+        .super-dashboard-charts, .super-dashboard-lower { grid-template-columns:minmax(0,1fr); gap:.8rem; }
+        .super-dashboard-panel:first-child { grid-column:auto; }
+        .super-dashboard-chart-card canvas { height:235px !important; max-height:235px !important; }
+        .super-dashboard-panel { overflow:hidden; }
+    }
+</style>
+<div class="container super-dashboard dashboard-workspace" data-dashboard="super-admin">
     <!-- Header with Time Period Filter -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <div>
-            <h1 style="margin: 0 0 0.5rem 0;">Super Admin Dashboard</h1>
-            <p style="margin: 0; color: #666;">Welcome back! Here's what's happening with your system.</p>
-        </div>
-        <form method="GET" style="display: flex; gap: 0.5rem; align-items: center;">
-            <label style="color: #666; font-size: 0.875rem;">Time Period:</label>
-            <select name="period" onchange="this.form.submit()" style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 0.875rem;">
+    <div class="super-dashboard-heading">
+        @include('components.dashboard-heading', ['area' => 'University operations', 'title' => 'University overview', 'description' => 'Welcome back, ' . auth()->user()->name . '.'])
+        <form method="GET" class="super-dashboard-period">
+            <label for="dashboard-period">Time Period</label>
+            <select id="dashboard-period" name="period" onchange="this.form.submit()">
                 <option value="all" {{ $period === 'all' ? 'selected' : '' }}>All Time</option>
                 <option value="today" {{ $period === 'today' ? 'selected' : '' }}>Today</option>
                 <option value="week" {{ $period === 'week' ? 'selected' : '' }}>This Week</option>
@@ -20,6 +58,8 @@
             </select>
         </form>
     </div>
+
+    <p class="dashboard-filter-scope" role="status">{{ $periodNotice ?? 'All-time transactions' }}. The filter applies to completed revenue, approved receipt counts, and recent transaction lists. Student/user totals, workloads, approval rate, activity, and charts retain their stated scopes.</p>
 
     <!-- System Alerts -->
     @if(count($alerts) > 0)
@@ -37,7 +77,7 @@
     @endif
 
     <!-- Quick Actions -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <div class="super-dashboard-actions">
         <a href="{{ route('users.create') }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
             <span>👤</span> Create User
         </a>
@@ -53,63 +93,32 @@
     </div>
 
     <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Students</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #3498db; font-size: 2rem;">{{ number_format($stats['total_students']) }}</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">{{ $stats['active_students'] }} active</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #9b59b6; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Users</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #9b59b6; font-size: 2rem;">{{ number_format($stats['total_users']) }}</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">+{{ $stats['recent_registrations'] }} last 30 days</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #27ae60; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Revenue</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #27ae60; font-size: 2rem;">K{{ number_format($stats['total_revenue'], 0) }}</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">{{ $stats['completed_payments'] }} transactions</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #e74c3c; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Pending Receipts</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #e74c3c; font-size: 2rem;">{{ $stats['pending_receipts'] }}</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">K{{ number_format($stats['pending_receipts_amount'], 0) }} total</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #f39c12; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Enrollments</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #f39c12; font-size: 2rem;">{{ number_format($stats['total_enrollments']) }}</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">{{ $stats['active_enrollments'] }} active</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #16a085; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Approval Rate</p>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; color: #16a085; font-size: 2rem;">{{ $stats['approval_rate'] }}%</h2>
-            <p style="margin: 0; color: #999; font-size: 0.75rem;">{{ $stats['approved_receipts'] }} approved</p>
-        </div>
-    </div>
+    @include('components.dashboard-metrics', ['metrics' => [
+        ['label' => 'Total Students', 'value' => number_format($stats['total_students']), 'detail' => $stats['active_students'] . ' active students', 'icon' => 'students', 'tone' => 'blue'],
+        ['label' => 'Total Users', 'value' => number_format($stats['total_users']), 'detail' => $stats['recent_registrations'] . ' registered in the last 30 days', 'icon' => 'account'],
+        ['label' => 'Total Revenue', 'value' => 'K' . number_format($stats['total_revenue'], 0), 'detail' => $stats['completed_payments'] . ' completed transactions', 'icon' => 'payments', 'tone' => 'green'],
+        ['label' => 'Pending Receipts', 'value' => $stats['pending_receipts'], 'detail' => 'K' . number_format($stats['pending_receipts_amount'], 0) . ' awaiting review', 'icon' => 'receipts', 'tone' => 'rose'],
+    ]])
 
     <!-- Charts Row -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <div class="super-dashboard-charts">
         <!-- Payment Trend Chart -->
-        <div class="card">
+        <div class="card super-dashboard-chart-card">
             <h3 style="margin: 0 0 1.5rem 0;">Payment Trend (Last 12 Months)</h3>
-            <canvas id="paymentTrendChart" style="max-height: 300px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'paymentTrendChart', 'label' => 'Payment trend for the last twelve months', 'hasData' => collect($payment_trend['data'])->contains(fn ($amount) => (float) $amount !== 0.0), 'emptyMessage' => 'No payment activity in the last twelve months.'])
         </div>
 
         <!-- Enrollment by Program Chart -->
-        <div class="card">
+        <div class="card super-dashboard-chart-card">
             <h3 style="margin: 0 0 1.5rem 0;">Enrollment by Program</h3>
-            <canvas id="enrollmentChart" style="max-height: 300px;"></canvas>
+            @include('components.dashboard-chart', ['chartId' => 'enrollmentChart', 'label' => 'Students by programme', 'hasData' => array_sum($enrollment_by_program) > 0, 'emptyMessage' => 'No student programme records to display yet.'])
         </div>
     </div>
 
     <!-- Recent Activity & Tables Row -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem;">
+    <div class="super-dashboard-lower">
         <!-- Recent Activity Feed -->
-        <div class="card">
+        <div class="card super-dashboard-panel">
             <h3 style="margin: 0 0 1.5rem 0;">Recent Activity</h3>
             <div style="max-height: 400px; overflow-y: auto;">
                 @forelse($recent_activity as $activity)
@@ -127,7 +136,7 @@
         </div>
 
         <!-- Recent Payments -->
-        <div class="card">
+        <div class="card super-dashboard-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="margin: 0;">Recent Payments</h3>
                 <a href="{{ route('payments.index') }}" style="color: #3498db; text-decoration: none; font-size: 0.875rem;">View All →</a>
@@ -160,7 +169,7 @@
         </div>
 
         <!-- Recent Receipts -->
-        <div class="card">
+        <div class="card super-dashboard-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="margin: 0;">Recent Receipts</h3>
                 <a href="{{ route('receipts.index') }}" style="color: #3498db; text-decoration: none; font-size: 0.875rem;">View All →</a>
@@ -204,8 +213,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Payment Trend Chart
-    const paymentCtx = document.getElementById('paymentTrendChart').getContext('2d');
-    new Chart(paymentCtx, {
+    renderDashboardChart('paymentTrendChart', {
         type: 'line',
         data: {
             labels: @json($payment_trend['labels']),
@@ -251,9 +259,8 @@
     });
 
     // Enrollment by Program Chart
-    const enrollmentCtx = document.getElementById('enrollmentChart').getContext('2d');
     const enrollmentData = @json($enrollment_by_program);
-    new Chart(enrollmentCtx, {
+    renderDashboardChart('enrollmentChart', {
         type: 'doughnut',
         data: {
             labels: Object.keys(enrollmentData),

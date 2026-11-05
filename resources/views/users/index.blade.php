@@ -2,66 +2,68 @@
 
 @section('content')
 <style>
-    .stats-grid {
+    .operations-management .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
-    .stat-card {
+    .operations-management .stat-card {
         background: white;
         padding: 1.5rem;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         border-left: 4px solid;
     }
-    .stat-card.total { border-left-color: #3b82f6; }
-    .stat-card.super-admin { border-left-color: #8b5cf6; }
-    .stat-card.admin { border-left-color: #10b981; }
-    .stat-card.student { border-left-color: #f59e0b; }
-    .stat-card.parent { border-left-color: #ec4899; }
-    .stat-card.inactive { border-left-color: #ef4444; }
-    .stat-label { color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem; }
-    .stat-value { font-size: 1.875rem; font-weight: bold; color: #111827; }
+    .operations-management .stat-card.total { border-left-color: #2264b5; }
+    .operations-management .stat-card.super-admin { border-left-color: #6554c0; }
+    .operations-management .stat-card.admin { border-left-color: #087f82; }
+    .operations-management .stat-card.student { border-left-color: #2264b5; }
+    .operations-management .stat-card.parent { border-left-color: #6554c0; }
+    .operations-management .stat-card.inactive { border-left-color: #b9384e; }
+    .operations-management .stat-label { color: #52627a; font-size: 0.875rem; margin-bottom: 0.5rem; }
+    .operations-management .stat-value { font-size: 1.875rem; font-weight: bold; color: #172b4d; }
     
-    .filter-section {
+    .operations-management .filter-section {
         background: white;
         padding: 1.5rem;
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         margin-bottom: 2rem;
     }
-    .filter-grid {
+    .operations-management .filter-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
         margin-top: 1rem;
     }
     
-    .role-badge {
+    .operations-management .role-badge {
         padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
+        border-radius: 4px;
         font-size: 0.75rem;
         font-weight: 600;
         display: inline-block;
     }
-    .role-super-admin { background: #ede9fe; color: #7c3aed; }
-    .role-admin { background: #d1fae5; color: #059669; }
-    .role-student { background: #fef3c7; color: #d97706; }
-    .role-parent { background: #fce7f3; color: #db2777; }
+    .operations-management .role-super-admin { background: #eeebfa; color: #51409f; }
+    .operations-management .role-admin { background: #e4f4ef; color: #086453; }
+    .operations-management .role-student { background: #e9f2ff; color: #245694; }
+    .operations-management .role-parent { background: #fcebef; color: #9c243b; }
+    .operations-management .role-lecturer { background: #e4f4ef; color: #086453; }
 </style>
 
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-8 flex justify-between items-center">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management mx-auto px-4 py-8">
+    <div class="ops-header mb-8 flex justify-between items-center">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
             <p class="text-gray-600 mt-2">Manage system users and permissions</p>
         </div>
-        <div class="flex gap-2">
-            <a href="{{ route('users.export', request()->query()) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+        <div class="ops-actions flex gap-2">
+            <a href="{{ route('users.export', request()->query()) }}" class="btn btn-success bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
                 📊 Export to Excel
             </a>
-            <a href="{{ route('users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <a href="{{ route('users.create') }}" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                 ➕ Add New User
             </a>
         </div>
@@ -115,7 +117,7 @@
     <div class="filter-section">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">🔍 Search & Filters</h3>
         <form method="GET" action="{{ route('users.index') }}">
-            <div class="filter-grid">
+            <div class="filter-grid filter-form">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
                     <input type="text" name="search" value="{{ request('search') }}" 
@@ -152,15 +154,15 @@
                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
                 </div>
             </div>
-            <div class="mt-4 flex gap-2">
+            <div class="ops-actions mt-4 flex gap-2">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">Apply Filters</button>
-                <a href="{{ route('users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md">Clear</a>
+                <a href="{{ route('users.index') }}" class="btn btn-secondary bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md">Clear</a>
             </div>
         </form>
     </div>
 
     <!-- Users Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="table-container bg-white rounded-lg shadow" role="region" aria-label="Users" tabindex="0">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -211,7 +213,7 @@
                                 <div class="text-xs text-gray-500">{{ $user->created_at->diffForHumans() }}</div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ops-table-actions">
                             <a href="{{ route('users.show', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
                             @if(!$user->deleted_at)
                                 <a href="{{ route('users.edit', $user) }}" class="text-green-600 hover:text-green-900 mr-3">Edit</a>

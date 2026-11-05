@@ -12,8 +12,8 @@ class Course extends Model
         'description',
         'credits',
         'department',
+        'term',
         'instructor',
-        'semester',
         'tuition_fee',
         'status',
     ];

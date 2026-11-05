@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management mx-auto px-4 py-8">
+    <div class="ops-page-title mb-8">
         <a href="{{ route('users.index') }}" class="text-blue-600 hover:text-blue-900">&larr; Back to Users</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-4">User Details</h1>
     </div>
@@ -13,10 +14,10 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="ops-detail-grid grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- User Info Card -->
         <div class="md:col-span-2 bg-white rounded-lg shadow p-8">
-            <div class="flex justify-between items-start mb-6">
+            <div class="ops-flex flex justify-between items-start mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
                     <p class="text-gray-600">{{ $user->email }}</p>
@@ -33,7 +34,7 @@
 
             <hr class="my-6">
 
-            <div class="grid grid-cols-2 gap-6">
+            <div class="ops-grid grid grid-cols-2 gap-6">
                 <div>
                     <p class="text-sm text-gray-600">User ID</p>
                     <p class="text-lg font-medium text-gray-900">#{{ $user->id }}</p>
@@ -71,7 +72,7 @@
                 <hr class="my-6">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">📚 Student Record</h3>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="ops-grid grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-600">Student ID</p>
                             <p class="font-medium">{{ $user->student->student_id }}</p>
@@ -102,7 +103,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">👨‍👩‍👧‍👦 Children</h3>
                     <div class="space-y-3">
                         @foreach($user->childrenAsParent as $child)
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                            <div class="ops-flex flex justify-between items-center p-3 bg-gray-50 rounded">
                                 <div>
                                     <p class="font-medium">{{ $child->first_name }} {{ $child->last_name }}</p>
                                     <p class="text-sm text-gray-600">{{ $child->student_id }} - {{ $child->program ?? 'N/A' }}</p>
@@ -147,7 +148,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Actions</h3>
                 <div class="space-y-3">
                     @if(!$user->deleted_at)
-                        <a href="{{ route('users.edit', $user) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                        <a href="{{ route('users.edit', $user) }}" class="btn btn-primary block w-full text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
                             Edit User
                         </a>
                         
@@ -182,7 +183,7 @@
 </div>
 
 <!-- Password Reset Modal -->
-<div id="reset-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div id="reset-password-modal" class="operations-management ops-modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
         <h3 class="text-xl font-bold text-gray-900 mb-4">Reset Password for {{ $user->name }}</h3>
         <form action="{{ route('users.reset-password', $user) }}" method="POST">
@@ -197,7 +198,7 @@
                 <input type="password" name="new_password_confirmation" required minlength="8"
                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
             </div>
-            <div class="flex gap-3">
+            <div class="ops-actions flex gap-3">
                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
                     Reset Password
                 </button>

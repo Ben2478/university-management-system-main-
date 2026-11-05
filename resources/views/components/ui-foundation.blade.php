@@ -1,0 +1,1 @@
+<link rel="stylesheet" href="{{ asset('css/application-ui.css') }}?v={{ filemtime(public_path('css/application-ui.css')) }}">

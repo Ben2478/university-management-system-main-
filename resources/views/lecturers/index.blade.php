@@ -1,8 +1,9 @@
 @extends('layouts.super-admin')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap: 1rem; margin-bottom: 1.5rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="padding: 2rem 0;">
+    <div class="ops-header" style="display:flex; justify-content:space-between; align-items:center; gap: 1rem; margin-bottom: 1.5rem;">
         <div>
             <h1 style="margin:0 0 .25rem 0;">Lecturers</h1>
             <p style="margin:0; color:#666;">Manage lecturers and assign them to courses</p>
@@ -16,7 +17,7 @@
         </div>
     @endif
 
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <div class="ops-stats">
         <div class="card" style="border-left:4px solid #3498db; padding:1.25rem;">
             <div style="color:#666; font-size:.75rem; text-transform:uppercase; font-weight:700;">Total</div>
             <div style="color:#3498db; font-size:2rem; font-weight:800;">{{ $stats['total'] }}</div>
@@ -31,7 +32,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card ops-table-scroll" role="region" aria-label="Lecturers" tabindex="0">
         <table style="width:100%; border-collapse:collapse;">
             <thead>
                 <tr style="background:#34495e; color:#fff;">
@@ -67,13 +68,13 @@
                             @endif
                         </td>
                         <td style="padding:1rem; text-align:center;">
-                            <div style="display:flex; gap:.5rem; justify-content:center;">
-                                <a href="{{ route('lecturers.show', $lecturer) }}" style="padding:.4rem .75rem; background:#3498db; color:#fff; border-radius:.35rem; text-decoration:none; font-weight:700; font-size:.8rem;">View</a>
-                                <a href="{{ route('lecturers.edit', $lecturer) }}" style="padding:.4rem .75rem; background:#f39c12; color:#fff; border-radius:.35rem; text-decoration:none; font-weight:700; font-size:.8rem;">Edit</a>
+                            <div class="action-buttons" style="justify-content:center;">
+                                <a href="{{ route('lecturers.show', $lecturer) }}" class="btn btn-primary">View</a>
+                                <a href="{{ route('lecturers.edit', $lecturer) }}" class="btn btn-warning">Edit</a>
                                 <form action="{{ route('lecturers.destroy', $lecturer) }}" method="POST" onsubmit="return confirm('Delete this lecturer?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" style="padding:.4rem .75rem; background:#e74c3c; color:#fff; border:none; border-radius:.35rem; cursor:pointer; font-weight:700; font-size:.8rem;">Delete</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </div>
                         </td>

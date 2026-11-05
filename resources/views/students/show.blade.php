@@ -1,14 +1,15 @@
-@extends('layouts.app')
+@extends(auth()->user()->isSuperAdmin() ? 'layouts.super-admin' : 'layouts.admin')
 
 @section('content')
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/student-management.css') }}">
+<div class="student-management">
+    <div class="student-page-heading">
         <div>
-            <a href="{{ route('students.index') }}" style="color: #3498db; text-decoration: none;">← Back to Students</a>
-            <h1 style="margin-top: 0.5rem;">{{ $student->full_name }}</h1>
-            <p style="color: #666;">ID: {{ $student->student_id }}</p>
+            <a href="{{ route('students.index') }}" class="student-back-link">← Back to Students</a>
+            <h1>{{ $student->full_name }}</h1>
+            <p>ID: {{ $student->student_id }}</p>
         </div>
-        <div style="display: flex; gap: 1rem;">
+        <div class="student-actions">
             <a href="{{ route('students.edit', $student) }}" class="btn">Edit</a>
             <form action="{{ route('students.destroy', $student) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this student?');">
                 @csrf
@@ -20,42 +21,42 @@
 
     <!-- Login Credentials Alert (shown only when student is first created) -->
     @if(session('login_credentials'))
-    <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="margin-top: 0; color: #155724;">✓ Student Account Created Successfully!</h3>
-        <p style="margin-bottom: 1rem;"><strong>Login credentials have been generated. Please save these details and share them with the student:</strong></p>
+    <div class="student-credentials" role="status">
+        <h3>✓ Student Account Created Successfully!</h3>
+        <p style="margin-bottom: 1rem;"><strong>{{ session('login_email_status') }}</strong></p>
+        <p style="margin-bottom: 1rem;">Student login credentials:</p>
         
-        <div style="background: white; padding: 1rem; border-radius: 5px; border: 1px solid #c3e6cb;">
+        <div class="student-credentials-details">
             <p style="margin: 0.5rem 0;"><strong>Student ID (Login):</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['student_id'] }}</code></p>
             <p style="margin: 0.5rem 0;"><strong>Default Password:</strong> <code style="background: #fff3cd; padding: 0.25rem 0.5rem; border-radius: 3px; color: #856404;">{{ session('login_credentials')['password'] }}</code></p>
             <p style="margin: 0.5rem 0;"><strong>Email (for records):</strong> <code style="background: #f8f9fa; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ session('login_credentials')['email'] }}</code></p>
         </div>
         
         <p style="margin-top: 1rem; margin-bottom: 0; font-size: 0.9rem;">
-            <strong>⚠️ Important:</strong> These credentials will only be shown once. Make sure to copy them or print this page. 
-            The student can use these credentials to log in at <strong>{{ url('/login') }}</strong>
+            <strong>Important:</strong> Students sign in with their Student ID and temporary password, then must change the password. Login: <strong>{{ url('/login') }}</strong>
         </p>
     </div>
     @endif
 
     <!-- Balance & Payment Section -->
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="student-section">
         <h2>Financial Summary</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 8px;">
-                <p style="opacity: 0.9;">Year & Semester</p>
-                <p style="font-size: 1.5rem; font-weight: bold;">Year {{ $student->year }}, Semester {{ $student->semester }}</p>
+        <div class="student-stats">
+            <div class="student-metric">
+                <p>Year & Semester</p>
+                <p class="student-metric-value">Year {{ $student->year }}, Semester {{ $student->semester }}</p>
             </div>
-            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 8px;">
-                <p style="opacity: 0.9;">Tuition Fee</p>
-                <p style="font-size: 1.5rem; font-weight: bold;">K{{ number_format($student->tuition_fee, 2) }}</p>
+            <div class="student-metric">
+                <p>Tuition Fee</p>
+                <p class="student-metric-value">K{{ number_format($student->tuition_fee, 2) }}</p>
             </div>
-            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 8px;">
-                <p style="opacity: 0.9;">Amount Paid</p>
-                <p style="font-size: 1.5rem; font-weight: bold;">K{{ number_format($student->getPaidAmount(), 2) }}</p>
+            <div class="student-metric">
+                <p>Amount Paid</p>
+                <p class="student-metric-value">K{{ number_format($student->getPaidAmount(), 2) }}</p>
             </div>
-            <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 8px;">
-                <p style="opacity: 0.9;">Balance Due</p>
-                <p style="font-size: 1.5rem; font-weight: bold;">
+            <div class="student-metric">
+                <p>Balance Due</p>
+                <p class="student-metric-value">
                     @if($student->getBalance() <= 0)
                         Fully Paid ✓
                     @else
@@ -65,18 +66,25 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 1rem;">
+        <div class="student-actions">
             <a href="{{ route('receipts.create', ['student_id' => $student->id]) }}" class="btn btn-success">+ Upload Receipt</a>
             <a href="{{ route('receipts.student-receipts', $student) }}" class="btn">View Payment History</a>
         </div>
     </div>
 
     <!-- Personal Information -->
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="student-section">
         <h2>Personal Information</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div class="student-info-grid">
             <div>
                 <p><strong>Email:</strong> {{ $student->email }}</p>
+                <p><strong>Student Type:</strong> {{ $student->isShortCourse() ? 'Short Course' : 'Regular' }}</p>
+                @if($student->isShortCourse())
+                    <p><strong>Course Phase:</strong> {{ $student->shortCoursePhase() }}</p>
+                    <p><strong>Theory:</strong> {{ $student->enrollment_date->format('M d, Y') }} – {{ $student->shortCourseTheoryEndsOn()->copy()->subDay()->format('M d, Y') }}</p>
+                    <p><strong>Practical:</strong> {{ $student->shortCourseTheoryEndsOn()->format('M d, Y') }} – {{ $student->shortCourseCompletesOn()->copy()->subDay()->format('M d, Y') }}</p>
+                    <p><strong>Login ends:</strong> {{ $student->shortCourseCompletesOn()->format('M d, Y') }}</p>
+                @endif
                 <p><strong>NRC:</strong> {{ $student->nrc ?? 'N/A' }}</p>
                 <p><strong>Phone:</strong> {{ $student->phone ?? 'N/A' }}</p>
                 <p><strong>Date of Birth:</strong> {{ $student->date_of_birth?->format('M d, Y') ?? 'N/A' }}</p>
@@ -89,15 +97,16 @@
                 <p><strong>State:</strong> {{ $student->state ?? 'N/A' }}</p>
                 <p><strong>Postal Code:</strong> {{ $student->postal_code ?? 'N/A' }}</p>
                 <p><strong>Enrollment Date:</strong> {{ $student->enrollment_date?->format('M d, Y') ?? 'N/A' }}</p>
-                <p><strong>Status:</strong> <span class="badge badge-success">{{ ucfirst($student->status) }}</span></p>
+                <p><strong>Status:</strong> <span class="status-badge {{ $student->status }}">{{ ucfirst($student->status) }}</span></p>
             </div>
         </div>
     </div>
 
     <!-- Enrolled Courses -->
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="student-section">
         <h2>Enrolled Courses</h2>
         @if($student->enrollments->count() > 0)
+            <div class="student-table-scroll" role="region" aria-label="Enrolled courses" tabindex="0">
             <table>
                 <thead>
                     <tr>
@@ -118,15 +127,17 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <p style="color: #999; text-align: center; padding: 2rem;">No courses enrolled</p>
         @endif
     </div>
 
     <!-- Recent Payment Receipts -->
-    <div class="card">
+    <div class="student-section">
         <h2>Recent Payment Receipts</h2>
         @if($student->receipts->count() > 0)
+            <div class="student-table-scroll" role="region" aria-label="Recent payment receipts" tabindex="0">
             <table>
                 <thead>
                     <tr>
@@ -157,6 +168,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             <div style="margin-top: 1rem; text-align: center;">
                 <a href="{{ route('receipts.student-receipts', $student) }}" style="color: #3498db; text-decoration: none;">View All Receipts →</a>
             </div>

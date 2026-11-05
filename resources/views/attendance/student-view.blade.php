@@ -1,14 +1,15 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
+<div class="container academic-records">
+    <div class="records-header">
         <h1 style="margin: 0 0 0.5rem 0;">My Attendance</h1>
         <p style="margin: 0; color: #666;">Track your class attendance across all courses</p>
     </div>
 
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="records-stats">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase;">Total Classes</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['total'] }}</h2>
@@ -52,9 +53,9 @@
 
     <!-- Attendance Records -->
     @if($attendances->count() > 0)
-    <div class="card">
+    <div class="records-surface">
         <h3 style="margin: 0 0 1.5rem 0;">Attendance Record</h3>
-        <div style="overflow-x: auto;">
+        <div class="records-table" tabindex="0" role="region" aria-label="Student attendance report">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 2px solid #ddd; background: #f8f9fa;">
@@ -72,7 +73,7 @@
                         <td style="padding: 1rem; font-weight: 600;">{{ $attendance->course->course_code }}</td>
                         <td style="padding: 1rem;">{{ $attendance->course->course_name }}</td>
                         <td style="padding: 1rem; text-align: center;">
-                            <span style="padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 600; font-size: 0.875rem;
+                            <span class="status-badge status-{{ $attendance->status }}" style="padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 600; font-size: 0.875rem;
                                 background-color: {{ $attendance->status === 'present' ? '#d4edda' : ($attendance->status === 'late' ? '#fff3cd' : ($attendance->status === 'excused' ? '#d1ecf1' : '#f8d7da')) }};
                                 color: {{ $attendance->status === 'present' ? '#155724' : ($attendance->status === 'late' ? '#856404' : ($attendance->status === 'excused' ? '#0c5460' : '#721c24')) }};">
                                 @if($attendance->status === 'present')

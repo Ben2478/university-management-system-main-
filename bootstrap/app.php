@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
+            'short-course.active' => \App\Http\Middleware\EnsureShortCourseIsActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

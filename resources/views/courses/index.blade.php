@@ -1,13 +1,14 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management">
+    <div class="academic-header">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">Course Management</h1>
             <p style="margin: 0; color: #666;">Manage and organize courses by programs</p>
         </div>
-        <a href="{{ route('courses.create') }}" class="btn" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+        <a href="{{ route('courses.create') }}" class="btn academic-primary" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600;">
             + Add New Course
         </a>
     </div>
@@ -18,8 +19,14 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div style="padding: 1rem; margin-bottom: 2rem; background: #f8d7da; border-left: 4px solid #dc3545; border-radius: 0.25rem;">
+        <span style="color: #721c24; font-weight: 600;">{{ session('error') }}</span>
+    </div>
+    @endif
+
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="academic-stats">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Total Courses</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['total'] }}</h2>
@@ -39,8 +46,8 @@
     </div>
 
     <!-- Filters -->
-    <div class="card" style="margin-bottom: 2rem;">
-        <form method="GET" action="{{ route('courses.index') }}" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+    <div class="academic-surface">
+        <form method="GET" action="{{ route('courses.index') }}" class="academic-filters">
             <div>
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #2c3e50;">Search</label>
                 <input type="text" name="search" placeholder="Search by course name or code..." value="{{ request('search') }}" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem;">
@@ -55,6 +62,15 @@
                 </select>
             </div>
             <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #2c3e50;">Term</label>
+                <select name="term" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem; background: white;">
+                    <option value="">All Terms</option>
+                    @for($term = 1; $term <= 3; $term++)
+                        <option value="{{ $term }}" {{ request('term') == $term ? 'selected' : '' }}>Term {{ $term }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div>
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #2c3e50;">Status</label>
                 <select name="status" style="width: 100%; padding: 0.625rem; border: 1px solid #ddd; border-radius: 0.25rem; background: white;">
                     <option value="">All Status</option>
@@ -62,12 +78,12 @@
                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                 </select>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div class="academic-actions">
                 <button type="submit" style="padding: 0.625rem 1.25rem; background: #3498db; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600;">
                     🔍 Filter
                 </button>
-                @if(request()->hasAny(['search', 'department', 'status']))
-                    <a href="{{ route('courses.index') }}" style="padding: 0.625rem 1.25rem; background: #95a5a6; color: white; border-radius: 0.25rem; text-decoration: none; font-weight: 600;">
+                @if(request()->hasAny(['search', 'department', 'term', 'status']))
+                    <a href="{{ route('courses.index') }}" class="academic-secondary" style="padding: 0.625rem 1.25rem; background: #95a5a6; color: white; border-radius: 0.25rem; text-decoration: none; font-weight: 600;">
                         Clear
                     </a>
                 @endif
@@ -77,7 +93,8 @@
 
     <!-- Courses Table -->
     @if($courses->count() > 0)
-    <div class="card">
+    <div class="academic-surface">
+        <div class="academic-table-scroll" role="region" aria-label="Courses" tabindex="0">
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background: #34495e; color: white;">
@@ -85,7 +102,7 @@
                     <th style="padding: 1rem; text-align: left; font-weight: 600;">Course Name</th>
                     <th style="padding: 1rem; text-align: left; font-weight: 600;">Program</th>
                     <th style="padding: 1rem; text-align: center; font-weight: 600;">Credits</th>
-                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Semester</th>
+                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Term</th>
                     <th style="padding: 1rem; text-align: center; font-weight: 600;">Enrollments</th>
                     <th style="padding: 1rem; text-align: center; font-weight: 600;">Status</th>
                     <th style="padding: 1rem; text-align: center; font-weight: 600;">Actions</th>
@@ -117,7 +134,7 @@
                         <span style="font-weight: 600; color: #34495e;">{{ $course->credits ?? 'N/A' }}</span>
                     </td>
                     <td style="padding: 1rem; text-align: center;">
-                        <span style="font-weight: 600; color: #34495e;">{{ $course->semester ?? 'N/A' }}</span>
+                        <span style="font-weight: 600; color: #34495e;">{{ $course->term ? 'Term ' . $course->term : 'N/A' }}</span>
                     </td>
                     <td style="padding: 1rem; text-align: center;">
                         <span style="padding: 0.25rem 0.75rem; background: #fff3e0; color: #e65100; border-radius: 0.25rem; font-weight: 600;">
@@ -136,7 +153,7 @@
                         @endif
                     </td>
                     <td style="padding: 1rem; text-align: center;">
-                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                        <div class="academic-actions" style="justify-content: center;">
                             <a href="{{ route('courses.show', $course) }}" style="padding: 0.375rem 0.75rem; background: #3498db; color: white; border-radius: 0.25rem; text-decoration: none; font-size: 0.75rem; font-weight: 600;">
                                 View
                             </a>
@@ -146,7 +163,7 @@
                             <form action="{{ route('courses.destroy', $course) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this course?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" style="padding: 0.375rem 0.75rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
+                                <button type="submit" class="academic-danger" style="padding: 0.375rem 0.75rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">
                                     Delete
                                 </button>
                             </form>
@@ -156,25 +173,26 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <!-- Pagination -->
         @if($courses->hasPages())
-        <div style="padding: 1.5rem; border-top: 1px solid #ecf0f1;">
+        <div class="academic-pagination">
             {{ $courses->links() }}
         </div>
         @endif
     </div>
     @else
-    <div class="card" style="text-align: center; padding: 3rem;">
+    <div class="academic-surface academic-empty">
         <p style="color: #999; font-size: 1.125rem; margin-bottom: 1rem;">📚 No courses found</p>
         <p style="color: #666; font-size: 0.875rem; margin-bottom: 1.5rem;">
-            @if(request()->hasAny(['search', 'department', 'status']))
+            @if(request()->hasAny(['search', 'department', 'term', 'status']))
                 Try adjusting your filters or search terms.
             @else
                 Get started by adding your first course.
             @endif
         </p>
-        @if(request()->hasAny(['search', 'department', 'status']))
+        @if(request()->hasAny(['search', 'department', 'term', 'status']))
             <a href="{{ route('courses.index') }}" style="padding: 0.75rem 1.5rem; background: #95a5a6; color: white; border-radius: 0.25rem; text-decoration: none; font-weight: 600;">
                 Clear Filters
             </a>

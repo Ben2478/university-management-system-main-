@@ -363,9 +363,10 @@
             color: #666;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
 </head>
-<body>
-    <div class="container">
+<body class="records-standalone">
+    <div class="container academic-records">
         <div class="header">
             <h1>Grades Management</h1>
             <div class="header-actions">
@@ -470,7 +471,7 @@
             <div class="alert-success">{{ $message }}</div>
         @endif
 
-        <div class="table-container">
+        <div class="table-container" tabindex="0" role="region" aria-label="Grade records">
             @if ($grades->count() > 0)
                 <table>
                     <thead>

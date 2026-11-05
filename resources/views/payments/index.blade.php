@@ -2,6 +2,7 @@
 
 @section('content')
 <style>
+    @scope (.finance-management) {
     .card {
         background: white;
         padding: 1.5rem;
@@ -354,15 +355,17 @@
         font-weight: 700;
         color: #111827;
     }
+    }
 </style>
 
-<div style="margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="finance-management" style="margin-bottom: 2rem;">
+    <div class="finance-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <div>
             <h1 style="font-size: 1.875rem; font-weight: 800; color: #111827; margin: 0;">💳 Payment Records</h1>
             <p style="color: #6b7280; margin: 0.5rem 0 0 0;">Track and manage all student payment transactions</p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
+        <div class="finance-actions" style="display: flex; gap: 0.75rem;">
             <a href="{{ route('payments.export', request()->query()) }}" class="action-btn success">
                 📊 Export Report
             </a>
@@ -478,7 +481,7 @@
         </button>
         
         <!-- Quick Date Filters -->
-        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+        <div class="finance-date-filters" style="margin-left: auto; display: flex; gap: 0.5rem;">
             <button class="quick-filter-btn {{ request('date_from') == now()->toDateString() ? 'active' : '' }}" 
                     onclick="window.location.href='{{ route('payments.index', array_merge(request()->except('page'), ['date_from' => now()->toDateString(), 'date_to' => now()->toDateString()])) }}'">
                 📅 Today
@@ -558,7 +561,7 @@
                                placeholder="10000.00">
                     </div>
                 </div>
-                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+                <div class="finance-actions" style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
                     <button type="submit" class="action-btn primary">
                         Apply Filters
                     </button>
@@ -573,6 +576,7 @@
     <!-- Payments Table -->
     <div class="payment-table">
         @if($payments->count() > 0)
+            <div class="finance-table-scroll" tabindex="0" role="region" aria-label="Payment records">
             <table>
                 <thead>
                     <tr>
@@ -677,6 +681,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <div class="empty-state">
                 <div class="empty-state-icon">💳</div>

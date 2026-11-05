@@ -6,6 +6,8 @@ use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class EnrollmentController extends Controller
 {
@@ -133,8 +135,14 @@ class EnrollmentController extends Controller
     // Show create enrollment form
     public function create()
     {
-        $students = Student::all();
-        $courses = Course::where('status', 'active')->get();
+        $students = Student::where('status', 'active')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+        $courses = Course::where('status', 'active')
+            ->orderBy('course_code')
+            ->get();
+
         return view('enrollments.create', compact('students', 'courses'));
     }
 
@@ -142,23 +150,78 @@ class EnrollmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'course_id' => 'required|exists:courses,id',
-            'program' => 'required|string',
-            'enrollment_date' => 'required|date',
+            'student_ids' => 'required|array|min:1',
+            'student_ids.*' => 'required|integer|distinct|exists:students,id',
+            'course_ids' => 'required|array|min:1',
+            'course_ids.*' => 'required|integer|distinct|exists:courses,id',
+            'status' => 'required|in:active,completed,dropped,suspended',
+            'enrollment_date' => 'nullable|date',
         ]);
 
-        // Check if already enrolled
-        $exists = Enrollment::where('student_id', $validated['student_id'])
-                            ->where('course_id', $validated['course_id'])
-                            ->exists();
+        $students = Student::whereIn('id', $validated['student_ids'])
+            ->where('status', 'active')
+            ->get();
+        $courses = Course::whereIn('id', $validated['course_ids'])
+            ->where('status', 'active')
+            ->get();
 
-        if ($exists) {
-            return back()->withErrors('Student is already enrolled in this course');
+        if ($students->count() !== count($validated['student_ids'])) {
+            throw ValidationException::withMessages([
+                'student_ids' => 'Select only active students.',
+            ]);
         }
 
-        Enrollment::create($validated);
-        return redirect()->route('enrollments.index')->with('success', 'Enrollment created successfully');
+        if ($courses->count() !== count($validated['course_ids'])) {
+            throw ValidationException::withMessages([
+                'course_ids' => 'Select only active courses.',
+            ]);
+        }
+
+        foreach ($students as $student) {
+            foreach ($courses as $course) {
+                if ($course->department !== $student->program) {
+                    throw ValidationException::withMessages([
+                        'course_ids' => "{$course->course_code} is not part of {$student->program}.",
+                    ]);
+                }
+            }
+        }
+
+        $enrollmentDate = $validated['enrollment_date'] ?? now()->toDateString();
+        $createdCount = 0;
+        $skippedCount = 0;
+
+        DB::transaction(function () use ($students, $courses, $validated, $enrollmentDate, &$createdCount, &$skippedCount) {
+            foreach ($students as $student) {
+                foreach ($courses as $course) {
+                    $exists = Enrollment::where('student_id', $student->id)
+                        ->where('course_id', $course->id)
+                        ->exists();
+
+                    if ($exists) {
+                        $skippedCount++;
+                        continue;
+                    }
+
+                    Enrollment::create([
+                        'student_id' => $student->id,
+                        'course_id' => $course->id,
+                        'program' => $student->program,
+                        'enrollment_date' => $enrollmentDate,
+                        'status' => $validated['status'],
+                    ]);
+
+                    $createdCount++;
+                }
+            }
+        });
+
+        $message = "Created {$createdCount} enrollment(s).";
+        if ($skippedCount > 0) {
+            $message .= " Skipped {$skippedCount} existing student-course pair(s).";
+        }
+
+        return redirect()->route('enrollments.index')->with('success', $message);
     }
 
     // Show enrollment details
@@ -195,8 +258,12 @@ class EnrollmentController extends Controller
     }
     
     // Show available courses for student enrollment
-    public function availableCourses()
+    public function availableCourses(Request $request)
     {
+        $validated = $request->validate([
+            'term' => 'nullable|integer|between:1,3',
+        ]);
+
         $user = auth()->user();
         
         if (!$user->isStudent()) {
@@ -221,12 +288,16 @@ class EnrollmentController extends Controller
                 // Match by department if program exists
                 return $query->where('department', $student->program);
             })
+            ->when($validated['term'] ?? null, function ($query, $term) {
+                $query->where('term', $term);
+            })
             ->whereNotIn('id', $enrolledCourseIds)
-            ->orderBy('semester')
+            ->orderBy('term')
             ->orderBy('course_code')
             ->get();
         
-        return view('enrollments.available-courses', compact('availableCourses', 'student'));
+        return view('enrollments.available-courses', compact('availableCourses', 'student'))
+            ->with('selectedTerm', $validated['term'] ?? null);
     }
     
     // Enroll student in a course

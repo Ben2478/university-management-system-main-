@@ -1,18 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container mx-auto px-4 py-8 finance-management">
     <div class="mb-8">
         <a href="{{ route('payments.index') }}" class="text-blue-600 hover:text-blue-900">&larr; Back to Payments</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-4">Payment Details</h1>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="finance-detail-grid grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Payment Info -->
-        <div class="md:col-span-2 bg-white rounded-lg shadow p-8">
+        <div class="finance-panel md:col-span-2 bg-white rounded-lg shadow p-8">
             <div class="mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Information</h2>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="finance-grid grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-gray-600">Student</p>
                         <p class="text-lg font-medium text-gray-900">
@@ -75,7 +76,7 @@
         </div>
 
         <!-- Timeline -->
-        <div class="bg-white rounded-lg shadow p-8">
+        <div class="finance-panel bg-white rounded-lg shadow p-8">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Timeline</h2>
             <div class="space-y-4">
                 <div>
@@ -108,7 +109,7 @@
     </div>
 
     @if($payment->gateway_response)
-        <div class="mt-6 bg-white rounded-lg shadow p-8">
+        <div class="finance-panel mt-6 bg-white rounded-lg shadow p-8">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Gateway Response</h2>
             <pre class="bg-gray-100 p-4 rounded text-xs overflow-auto">{{ json_encode($payment->gateway_response, JSON_PRETTY_PRINT) }}</pre>
         </div>

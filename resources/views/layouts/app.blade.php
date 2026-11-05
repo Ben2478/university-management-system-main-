@@ -169,6 +169,30 @@
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
 
+        select:not([multiple]) {
+            min-height: 44px;
+            padding-right: 2.5rem;
+            border-color: #cbd5e1;
+            border-radius: 0.4rem;
+            background-color: #fff;
+            color: #24313d;
+        }
+
+        select:focus-visible, button:focus-visible, a:focus-visible {
+            outline: 3px solid rgba(52, 152, 219, 0.35);
+            outline-offset: 2px;
+        }
+
+        select:disabled {
+            background-color: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+        }
+
         .form-error {
             color: #e74c3c;
             font-size: 0.85rem;
@@ -258,19 +282,21 @@
             text-decoration: underline;
         }
     </style>
+    @include('components.ui-foundation')
 </head>
 <body>
-    <nav class="navbar">
-        <h1>Student Management System</h1>
-        <div>
-            <a href="{{ route('dashboard') }}">Home</a>
-            <a href="{{ route('students.index') }}">Students</a>
-            <a href="{{ route('courses.index') }}">Courses</a>
-            <a href="{{ route('payments.index') }}">Payments</a>
-        </div>
-    </nav>
+    @auth
+        @include('components.global-header', ['hasSidebar' => false])
+    @else
+        <nav class="navbar" style="background: #fff; border-bottom: 1px solid #e8e4f2; box-shadow: 0 3px 14px rgba(48,36,76,.06);">
+            <a href="{{ route('login') }}" style="display: flex; align-items: center; gap: .75rem; color: #29233a; text-decoration: none;">
+                <img src="{{ asset('images/phoenix-open-university.jpeg') }}" alt="" style="width: 42px; height: 42px; object-fit: contain; border-radius: .55rem; background: #f5f2fb;">
+                <span><strong style="display: block; font-size: .95rem;">Phoenix Open University</strong><small style="color: #777188;">Management System</small></span>
+            </a>
+        </nav>
+    @endauth
 
-    <div class="container">
+    <div class="container phoenix-module-content">
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}

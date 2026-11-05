@@ -1,129 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Student - Student Management System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+@extends(auth()->user()->isSuperAdmin() ? 'layouts.super-admin' : 'layouts.admin')
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .form-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-card h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .error {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #764ba2;
-        }
-
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
+@section('content')
+<link rel="stylesheet" href="{{ asset('css/student-management.css') }}">
+    <div class="student-management student-management-form">
+        <header class="student-page-heading">
+            <div>
+                <a href="{{ route('students.index') }}" class="student-back-link">Back to Students</a>
+                <h1>Edit Student</h1>
+                <p>{{ $student->full_name }} &middot; {{ $student->student_id }}</p>
+            </div>
+        </header>
         <div class="form-card">
-            <h1>Edit Student</h1>
-
             @if ($errors->any())
                 <div class="alert alert-error">
                     <ul>
@@ -178,6 +65,8 @@
                         @error('date_of_birth') <span class="error">{{ $message }}</span> @enderror
                     </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="gender">Gender *</label>
                         <select id="gender" name="gender" required>
                             <option value="male" {{ old('gender', $student->gender) === 'male' ? 'selected' : '' }}>Male</option>
@@ -191,14 +80,9 @@
                     <label for="program">Program of Study *</label>
                     <select id="program" name="program" required>
                         <option value="">Select Program</option>
-                        <option value="Computer Science" {{ old('program', $student->program) === 'Computer Science' ? 'selected' : '' }}>Computer Science</option>
-                        <option value="Engineering" {{ old('program', $student->program) === 'Engineering' ? 'selected' : '' }}>Engineering</option>
-                        <option value="Business Administration" {{ old('program', $student->program) === 'Business Administration' ? 'selected' : '' }}>Business Administration</option>
-                        <option value="Medicine" {{ old('program', $student->program) === 'Medicine' ? 'selected' : '' }}>Medicine</option>
-                        <option value="Education" {{ old('program', $student->program) === 'Education' ? 'selected' : '' }}>Education</option>
-                        <option value="Law" {{ old('program', $student->program) === 'Law' ? 'selected' : '' }}>Law</option>
-                        <option value="Arts & Humanities" {{ old('program', $student->program) === 'Arts & Humanities' ? 'selected' : '' }}>Arts & Humanities</option>
-                        <option value="Natural Sciences" {{ old('program', $student->program) === 'Natural Sciences' ? 'selected' : '' }}>Natural Sciences</option>
+                        @foreach($programs as $program)
+                            <option value="{{ $program }}" {{ old('program', $student->program) === $program ? 'selected' : '' }}>{{ $program }}</option>
+                        @endforeach
                     </select>
                     @error('program') <span class="error">{{ $message }}</span> @enderror
                 </div>
@@ -267,5 +151,4 @@
             </form>
         </div>
     </div>
-</body>
-</html>
+@endsection

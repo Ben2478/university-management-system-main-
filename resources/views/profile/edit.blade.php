@@ -1,8 +1,9 @@
 @extends(auth()->user()->isStudent() ? 'layouts.student' : (auth()->user()->isAdmin() ? 'layouts.admin' : (auth()->user()->isSuperAdmin() ? 'layouts.super-admin' : 'layouts.parent')))
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="padding: 2rem 0;">
+    <div class="ops-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">Profile Settings</h1>
             <p style="margin: 0; color: #666;">Manage your account information and preferences</p>
@@ -25,7 +26,7 @@
         </div>
     @endif
 
-    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
         <!-- User Info Card -->
         <div class="card">
             <div style="text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid #ecf0f1;">
@@ -104,7 +105,7 @@
                 @csrf
                 @method('PUT')
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div>
                         <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Full Name *</label>
                         <input 
@@ -140,7 +141,7 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div>
                         <label for="phone" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Phone Number</label>
                         <input 
@@ -205,7 +206,7 @@
                     </p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                     <div>
                         <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">New Password</label>
                         <input 
@@ -236,11 +237,11 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
-                    <button type="submit" class="btn" style="background: #27ae60; color: white; padding: 1rem; border: none; border-radius: 0.375rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#229954'" onmouseout="this.style.background='#27ae60'">
+                <div class="ops-actions" style="gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success" style="background: #27ae60; color: white; padding: 1rem; border: none; border-radius: 0.375rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#229954'" onmouseout="this.style.background='#27ae60'">
                         💾 Save Changes
                     </button>
-                    <a href="{{ route('dashboard') }}" class="btn" style="background: #95a5a6; color: white; padding: 1rem; text-align: center; text-decoration: none; border-radius: 0.375rem; font-size: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='#7f8c8d'" onmouseout="this.style.background='#95a5a6'">
+                    <a href="{{ route('dashboard') }}" class="btn btn-secondary" style="background: #95a5a6; color: white; padding: 1rem; text-align: center; text-decoration: none; border-radius: 0.375rem; font-size: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='#7f8c8d'" onmouseout="this.style.background='#95a5a6'">
                         ✖️ Cancel
                     </a>
                 </div>

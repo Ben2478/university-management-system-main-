@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management">
+    <div class="ops-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <a href="{{ route('enrollments.index') }}" style="color: #3498db; text-decoration: none;">← Back to Enrollments</a>
             <h1 style="margin-top: 0.5rem;">Enrollment Details</h1>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
+        <div class="ops-actions" style="display: flex; gap: 0.5rem;">
             <a href="{{ route('enrollments.edit', $enrollment->id) }}" class="btn btn-warning">Edit</a>
             <form action="{{ route('enrollments.destroy', $enrollment->id) }}" method="POST" style="display: inline;">
                 @csrf
@@ -18,7 +19,7 @@
     </div>
 
     <div class="card">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <div>
                 <h3 style="margin-top: 0;">Student Information</h3>
                 <p><strong>Name:</strong> {{ $enrollment->student->first_name }} {{ $enrollment->student->last_name }}</p>
@@ -32,6 +33,7 @@
                 <h3 style="margin-top: 0;">Course Information</h3>
                 <p><strong>Course Name:</strong> {{ $enrollment->course->course_name }}</p>
                 <p><strong>Course Code:</strong> {{ $enrollment->course->course_code }}</p>
+                <p><strong>Term:</strong> {{ $enrollment->course->term ? 'Term ' . $enrollment->course->term : 'N/A' }}</p>
                 <p><strong>Credits:</strong> {{ $enrollment->course->credits ?? 'N/A' }}</p>
                 <p><strong>Instructor:</strong> {{ $enrollment->course->instructor ?? 'N/A' }}</p>
             </div>
@@ -39,7 +41,7 @@
 
         <hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div class="ops-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <div>
                 <h3 style="margin-top: 0;">Enrollment Information</h3>
                 <p><strong>Program:</strong> {{ $enrollment->program ?? 'N/A' }}</p>

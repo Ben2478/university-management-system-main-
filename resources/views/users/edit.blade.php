@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management mx-auto px-4 py-8">
+    <div class="ops-page-title mb-8">
         <a href="{{ route('users.index') }}" class="text-blue-600 hover:text-blue-900">&larr; Back to Users</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-4">Edit User</h1>
     </div>
@@ -17,12 +18,12 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow p-8">
+    <div class="form-container bg-white rounded-lg shadow p-8">
         <form action="{{ route('users.update', $user) }}" method="POST">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="ops-grid grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Name -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -82,11 +83,11 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex gap-3">
+            <div class="ops-actions mt-6 flex gap-3">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
                     Update User
                 </button>
-                <a href="{{ route('users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md">
+                <a href="{{ route('users.index') }}" class="btn btn-secondary bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md">
                     Cancel
                 </a>
             </div>

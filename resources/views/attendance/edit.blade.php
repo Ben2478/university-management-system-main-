@@ -1,7 +1,8 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
-<div class="container" style="max-width: 600px; margin: 30px auto;">
+<link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
+<div class="container academic-records records-form-page">
     <h2>Edit Attendance</h2>
 
     @if($errors->any())
@@ -14,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('attendance.update', $attendance) }}" method="POST" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form action="{{ route('attendance.update', $attendance) }}" method="POST" class="records-surface">
         @csrf
         @method('PUT')
 
@@ -54,7 +55,7 @@
             <textarea id="remarks" name="remarks" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">{{ $attendance->remarks }}</textarea>
         </div>
 
-        <div style="display: flex; gap: 10px;">
+        <div class="records-actions records-form-actions">
             <button type="submit" class="btn-success" style="flex: 1; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Update Attendance</button>
             <a href="{{ route('attendance.index') }}" class="btn-secondary" style="flex: 1; padding: 12px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 16px;">Cancel</a>
         </div>

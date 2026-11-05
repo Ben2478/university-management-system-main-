@@ -1,8 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="padding: 2rem 0;">
+    <div class="finance-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <div>
             <h1 style="margin: 0 0 0.5rem 0; color: #2c3e50;">⏳ Pending Receipt Reviews</h1>
             <p style="margin: 0; color: #666;">Review and approve student payment receipts awaiting verification</p>
@@ -25,7 +26,7 @@
     @endif
 
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="finance-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div class="card" style="border-left: 4px solid #f39c12; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Pending Reviews</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #f39c12; font-size: 2rem;">{{ $stats['pending_count'] }}</h2>
@@ -66,7 +67,7 @@
                 <p style="color: #666; font-size: 0.875rem;">No pending receipts to review at the moment.</p>
             </div>
         @else
-            <div style="overflow-x: auto;">
+            <div class="finance-table-scroll" tabindex="0" role="region" aria-label="Pending receipt reviews">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background: #34495e; color: white;">

@@ -1,14 +1,20 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
+<style>
+    .student-dashboard-main-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(280px,1fr); gap:1.25rem; align-items:start; }
+    .student-dashboard-main-grid > * { min-width:0; }
+    .student-dashboard-main-grid .card { border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    @media (max-width:900px) { .student-dashboard-main-grid { grid-template-columns:minmax(0,1fr); gap:1rem; } }
+    @media (max-width:600px) {
+        .student-dashboard-main-grid { gap:.8rem; }
+        .student-dashboard-main-grid .card { padding:1rem; }
+        .student-dashboard-main-grid table { min-width:520px; }
+    }
+</style>
+<div class="container dashboard-workspace" data-dashboard="student">
     <!-- Welcome Section -->
-    <div style="margin-bottom: 2rem;">
-        <h1 style="margin: 0 0 0.5rem 0; color: #2c3e50;">Welcome back, {{ $student->first_name }}! 👋</h1>
-        <p style="margin: 0; color: #666;">
-            <strong>{{ $student->student_id }}</strong> • {{ $student->program }} • Year {{ $student->year }}, Semester {{ $student->semester }}
-        </p>
-    </div>
+    @include('components.dashboard-heading', ['area' => 'Student workspace', 'title' => 'My learning overview', 'description' => $student->first_name . ' ' . $student->last_name . ' | ' . $student->student_id . ' | ' . $student->program])
 
     <!-- Alerts Section -->
     @if(!empty($alerts))
@@ -30,36 +36,15 @@
     @endif
 
     <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Enrolled Courses</p>
-            <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['enrolled_courses'] }}</h2>
-            <p style="margin: 0.25rem 0 0 0; color: #999; font-size: 0.75rem;">{{ $stats['total_credits'] }} total credits</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #9b59b6; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Current GPA</p>
-            <h2 style="margin: 0.5rem 0 0 0; color: #9b59b6; font-size: 2rem;">{{ number_format($stats['gpa'], 2) }}</h2>
-            <p style="margin: 0.25rem 0 0 0; color: #999; font-size: 0.75rem;">{{ $stats['total_grades'] }} courses graded</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #27ae60; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Amount Paid</p>
-            <h2 style="margin: 0.5rem 0 0 0; color: #27ae60; font-size: 2rem;">K{{ number_format($stats['amount_paid'], 2) }}</h2>
-            <p style="margin: 0.25rem 0 0 0; color: #999; font-size: 0.75rem;">of K{{ number_format($student->tuition_fee, 2) }}</p>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #e74c3c; padding: 1.25rem;">
-            <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Balance Due</p>
-            <h2 style="margin: 0.5rem 0 0 0; color: #e74c3c; font-size: 2rem;">K{{ number_format($stats['balance_due'], 2) }}</h2>
-            <p style="margin: 0.25rem 0 0 0; color: #999; font-size: 0.75rem;">
-                {{ $student->tuition_fee > 0 ? round(($stats['amount_paid'] / $student->tuition_fee) * 100) : 0 }}% paid
-            </p>
-        </div>
-    </div>
+    @include('components.dashboard-metrics', ['metrics' => [
+        ['label' => 'Enrolled Courses', 'value' => $stats['enrolled_courses'], 'detail' => $stats['total_credits'] . ' total credits', 'icon' => 'courses', 'tone' => 'blue'],
+        ['label' => 'Current GPA', 'value' => number_format($stats['gpa'], 2), 'detail' => $stats['total_grades'] . ' courses graded', 'icon' => 'grades'],
+        ['label' => 'Amount Paid', 'value' => 'K' . number_format($stats['amount_paid'], 2), 'detail' => 'of K' . number_format($student->tuition_fee, 2), 'icon' => 'payments', 'tone' => 'green'],
+        ['label' => 'Balance Due', 'value' => 'K' . number_format($stats['balance_due'], 2), 'detail' => ($student->tuition_fee > 0 ? round($stats['amount_paid'] / $student->tuition_fee * 100) : 0) . '% paid', 'icon' => 'receipts', 'tone' => 'rose'],
+    ]])
 
     <!-- Main Content Grid -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <div class="student-dashboard-main-grid">
         <!-- Left Column -->
         <div style="display: grid; gap: 2rem;">
             <!-- Active Courses -->
@@ -84,11 +69,11 @@
                         <div style="padding: 1.25rem; border: 2px solid #ecf0f1; border-radius: 0.5rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#3498db'; this.style.background='#f8f9fa'" onmouseout="this.style.borderColor='#ecf0f1'; this.style.background='white'">
                             <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                                 <div style="flex: 1;">
-                                    <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ $enrollment->course->name }}</h4>
+                                    <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">{{ $enrollment->course->course_name }}</h4>
                                     <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
                                         <span style="color: #666; font-size: 0.875rem;">📋 {{ $enrollment->course->course_code }}</span>
                                         <span style="color: #666; font-size: 0.875rem;">🎓 {{ $enrollment->course->credits }} Credits</span>
-                                        <span style="color: #666; font-size: 0.875rem;">🗓️ Semester {{ $enrollment->course->semester }}</span>
+                                        <span style="color: #666; font-size: 0.875rem;">Term {{ $enrollment->course->term }}</span>
                                     </div>
                                     @if($enrollment->course->instructor)
                                     <p style="margin: 0; color: #999; font-size: 0.75rem;">👨‍🏫 {{ $enrollment->course->instructor }}</p>
@@ -143,7 +128,7 @@
                                 <tr style="border-bottom: 1px solid #ecf0f1;">
                                     <td style="padding: 0.75rem;">
                                         <div>
-                                            <span style="font-weight: 600; color: #2c3e50;">{{ $grade->course->name ?? 'N/A' }}</span>
+                                            <span style="font-weight: 600; color: #2c3e50;">{{ $grade->course->course_name ?? 'N/A' }}</span>
                                             <br>
                                             <span style="font-size: 0.75rem; color: #999;">{{ $grade->course->course_code ?? '' }}</span>
                                         </div>

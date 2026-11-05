@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\AcademicCalendarController;
+use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\Auth\PasswordChangeController;
 use App\Http\Controllers\Auth\AdminRegisterController;
 
@@ -31,19 +33,20 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Force password change for first-time logins
 Route::get('/password/change', [PasswordChangeController::class, 'edit'])
     ->name('password.change')
-    ->middleware('auth');
+    ->middleware(['auth', 'short-course.active']);
 Route::post('/password/change', [PasswordChangeController::class, 'update'])
     ->name('password.change.update')
-    ->middleware('auth');
+    ->middleware(['auth', 'short-course.active']);
 
 // Root route with authentication
 Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
-    ->middleware(['auth']);
+    ->middleware(['auth', 'short-course.active']);
 
 // Redirect login to dashboard if already authenticated
-Route::middleware(['auth', 'password.changed'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'short-course.active'])->group(function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
+    Route::get('/global-search', GlobalSearchController::class)->name('global.search');
     
     // Profile Routes
     Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -58,6 +61,10 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('programs/{program}/add-courses', [ProgramController::class, 'addCourses'])->name('programs.add-courses');
     Route::post('programs/{program}/store-courses', [ProgramController::class, 'storeCourses'])->name('programs.store-courses');
     Route::resource('programs', ProgramController::class);
+
+    Route::resource('academic-calendar', AcademicCalendarController::class)
+        ->except(['show'])
+        ->middleware('role:super_admin,admin');
 
     // Lecturer Routes (Super Admin & Admin)
     Route::resource('lecturers', LecturerController::class)->middleware('role:super_admin,admin');

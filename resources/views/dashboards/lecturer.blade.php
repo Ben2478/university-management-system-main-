@@ -1,29 +1,26 @@
 @extends('layouts.lecturer')
 
 @section('content')
-<div class="container">
-    <div style="margin-bottom: 1.5rem;">
-        <h1 style="margin:0 0 .25rem 0;">Welcome, {{ $lecturer->full_name }}</h1>
-        <p style="margin:0; color:#666;">Here are your assigned courses and active enrollments</p>
-    </div>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-        <div class="card" style="border-left: 4px solid #6d28d9;">
-            <div style="color:#666; font-size:.8rem; font-weight:800; text-transform:uppercase;">My Courses</div>
-            <div style="font-size:2rem; font-weight:900; color:#6d28d9;">{{ $stats['courses_count'] }}</div>
-        </div>
-        <div class="card" style="border-left: 4px solid #10b981;">
-            <div style="color:#666; font-size:.8rem; font-weight:800; text-transform:uppercase;">Active Enrollments</div>
-            <div style="font-size:2rem; font-weight:900; color:#10b981;">{{ $stats['active_enrollments'] }}</div>
-        </div>
-    </div>
-
-    <div class="card">
+<style>
+    .lecturer-dashboard { padding-top:1.25rem; }
+    .lecturer-dashboard .card { min-width:0; border:1px solid #e8e5ee; border-radius:.65rem; box-shadow:0 2px 8px rgba(37,27,57,.045); }
+    .lecturer-courses-table-wrap { width:100%; overflow-x:auto; }
+    .lecturer-courses-table { width:100%; min-width:640px; border-collapse:collapse; }
+    @media (max-width:600px) { .lecturer-dashboard { padding:1rem; } .lecturer-dashboard > .container { padding:0; } }
+</style>
+<div class="container lecturer-dashboard dashboard-workspace" data-dashboard="lecturer">
+    @include('components.dashboard-heading', ['area' => 'Teaching workspace', 'title' => 'Teaching overview', 'description' => 'Welcome back, ' . $lecturer->full_name . '.'])
+    @include('components.dashboard-metrics', ['metrics' => [
+        ['label' => 'My Courses', 'value' => $stats['courses_count'], 'detail' => 'Assigned teaching courses', 'icon' => 'courses'],
+        ['label' => 'Active Enrollments', 'value' => $stats['active_enrollments'], 'detail' => 'Across your assigned courses', 'icon' => 'students', 'tone' => 'green'],
+    ]])
+    <div class="card lecturer-course-section">
         <h2 style="margin:0 0 1rem 0;">My Courses</h2>
         @if($courses->count() === 0)
             <p style="color:#666; margin:0;">No courses assigned yet. Ask the admin to assign you to courses.</p>
         @else
-            <table style="width:100%; border-collapse:collapse;">
+            <div class="lecturer-courses-table-wrap">
+            <table class="lecturer-courses-table">
                 <thead>
                     <tr style="background:#f6f5ff;">
                         <th style="padding: 1rem; text-align:left;">Course</th>
@@ -45,6 +42,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @endif
     </div>
 </div>

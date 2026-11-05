@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -33,6 +34,10 @@ class CourseController extends Controller
         // Filter by department
         if ($request->filled('department')) {
             $query->where('department', $request->department);
+        }
+
+        if ($request->filled('term')) {
+            $query->where('term', $request->term);
         }
 
         // Filter by status
@@ -77,8 +82,8 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'credits' => 'required|integer|min:1|max:6',
             'department' => 'required|string',
-            'semester' => 'required|integer|min:1|max:8',
-            'instructor' => 'nullable|string',
+            'term' => 'required|integer|min:1|max:3',
+            'instructor' => ['nullable', 'string', Rule::in($this->activeLecturerNames())],
             'tuition_fee' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'lecturer_ids' => 'nullable|array',
@@ -119,8 +124,8 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'credits' => 'required|integer|min:1|max:6',
             'department' => 'required|string',
-            'semester' => 'required|integer|min:1|max:8',
-            'instructor' => 'nullable|string',
+            'term' => 'required|integer|min:1|max:3',
+            'instructor' => ['nullable', 'string', Rule::in($this->activeLecturerNames())],
             'tuition_fee' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'lecturer_ids' => 'nullable|array',
@@ -139,7 +144,22 @@ class CourseController extends Controller
     // Delete course
     public function destroy(Course $course)
     {
+        if ($course->enrollments()->exists()) {
+            return redirect()->route('courses.index')
+                ->with('error', 'Courses with enrollment records cannot be deleted.');
+        }
+
         $course->delete();
         return redirect()->route('courses.index')->with('success', 'Course deleted successfully');
+    }
+
+    private function activeLecturerNames(): array
+    {
+        return Lecturer::where('status', 'active')
+            ->get()
+            ->map(fn (Lecturer $lecturer) => $lecturer->full_name)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

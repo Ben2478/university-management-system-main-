@@ -1,12 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management">
     <div class="card">
         <a href="{{ route('students.show', $receipt->student) }}" style="color: #3498db; text-decoration: none;">← Back to Student</a>
         <h2 style="margin-top: 1rem;">Receipt Details</h2>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
             <div>
                 <h4>Receipt Information</h4>
                 <p><strong>Student:</strong> {{ $receipt->student->first_name }} {{ $receipt->student->last_name }}</p>
@@ -49,7 +50,7 @@
                 <div style="background: #e7f3ff; border: 1px solid #3498db; border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem;">
                     <h4 style="margin-top: 0; color: #2980b9;">Review Actions</h4>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
                         <!-- Approve Form -->
                         <div style="background: white; padding: 1rem; border-radius: 4px; border: 1px solid #ddd;">
                             <h5 style="color: #28a745; margin-top: 0;">✓ Approve Receipt</h5>

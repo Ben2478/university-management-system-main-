@@ -1,13 +1,14 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management">
+    <div class="academic-header">
         <div>
             <h1 style="margin: 0 0 0.5rem 0;">Program Management</h1>
             <p style="margin: 0; color: #666;">Manage academic programs and their courses</p>
         </div>
-        <a href="{{ route('programs.create') }}" class="btn" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+        <a href="{{ route('programs.create') }}" class="btn academic-primary" style="background: #27ae60; color: white; padding: 0.75rem 1.5rem; border-radius: 0.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600;">
             + Add New Program
         </a>
     </div>
@@ -25,7 +26,7 @@
     @endif
 
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="academic-stats">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Total Programs</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['total'] }}</h2>
@@ -48,11 +49,11 @@
     @if($programs->count() > 0)
     <div style="display: grid; gap: 1.5rem;">
         @foreach($programs as $program)
-        <div class="card" style="border-left: 4px solid {{ $program->status === 'active' ? '#27ae60' : '#e74c3c' }};">
-            <div style="display: flex; justify-content: space-between; align-items: start; gap: 2rem;">
+        <div class="card academic-program" style="border-left: 4px solid {{ $program->status === 'active' ? '#27ae60' : '#e74c3c' }};">
+            <div class="academic-program-layout">
                 <!-- Program Info -->
-                <div style="flex: 1;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                <div class="academic-program-info">
+                    <div class="academic-program-title">
                         <h2 style="margin: 0; color: #2c3e50;">{{ $program->name }}</h2>
                         @if($program->status === 'active')
                             <span style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">
@@ -91,11 +92,11 @@
                 </div>
 
                 <!-- Actions -->
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="academic-actions academic-program-actions">
                     <a href="{{ route('programs.show', $program) }}" style="padding: 0.5rem 1rem; background: #3498db; color: white; border-radius: 0.25rem; text-decoration: none; text-align: center; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
                         👁️ View Details
                     </a>
-                    <a href="{{ route('programs.add-courses', $program) }}" style="padding: 0.5rem 1rem; background: #9b59b6; color: white; border-radius: 0.25rem; text-decoration: none; text-align: center; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
+                    <a href="{{ route('programs.add-courses', $program) }}" class="academic-primary" style="padding: 0.5rem 1rem; background: #9b59b6; color: white; border-radius: 0.25rem; text-decoration: none; text-align: center; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
                         📚 Add Courses
                     </a>
                     <a href="{{ route('programs.edit', $program) }}" style="padding: 0.5rem 1rem; background: #f39c12; color: white; border-radius: 0.25rem; text-decoration: none; text-align: center; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
@@ -104,7 +105,7 @@
                     <form action="{{ route('programs.destroy', $program) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this program?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" style="width: 100%; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
+                        <button type="submit" class="academic-danger" style="width: 100%; padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
                             🗑️ Delete
                         </button>
                     </form>
@@ -121,7 +122,7 @@
     </div>
     @endif
     @else
-    <div class="card" style="text-align: center; padding: 3rem;">
+    <div class="academic-surface academic-empty">
         <p style="color: #999; font-size: 1.125rem; margin-bottom: 1rem;">🎓 No programs found</p>
         <p style="color: #666; font-size: 0.875rem; margin-bottom: 1.5rem;">Get started by adding your first academic program</p>
         <a href="{{ route('programs.create') }}" style="padding: 0.75rem 1.5rem; background: #27ae60; color: white; border-radius: 0.25rem; text-decoration: none; font-weight: 600;">

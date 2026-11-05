@@ -1,8 +1,9 @@
 @extends('layouts.super-admin')
 
 @section('content')
-<div class="container" style="max-width: 900px; margin: 30px auto; padding: 0 20px;">
-    <div style="margin-bottom: 1.5rem;">
+<link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
+<div class="container operations-management" style="max-width: 900px; margin: 30px auto; padding: 0 20px;">
+    <div class="ops-header" style="margin-bottom: 1.5rem;">
         <h1 style="margin: 0 0 .25rem 0;">Add Lecturer</h1>
         <p style="margin:0; color:#666;">Create a lecturer account (login will be generated)</p>
     </div>
@@ -18,10 +19,10 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('lecturers.store') }}" style="background:#fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+    <form method="POST" action="{{ route('lecturers.store') }}" class="form-container">
         @csrf
 
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
+        <div class="ops-grid">
             <div>
                 <label style="display:block; margin-bottom:.5rem; font-weight:700;">First Name *</label>
                 <input name="first_name" value="{{ old('first_name') }}" required style="width:100%; padding:.75rem; border:1px solid #ddd; border-radius:8px;" />
@@ -56,9 +57,9 @@
             </div>
         </div>
 
-        <div style="display:flex; gap: 1rem; margin-top: 1.75rem;">
-            <button type="submit" style="flex:1; padding:.9rem; background:#27ae60; color:#fff; border:none; border-radius:8px; font-weight:800; cursor:pointer;">Create Lecturer</button>
-            <a href="{{ route('lecturers.index') }}" style="flex:1; padding:.9rem; background:#95a5a6; color:#fff; text-decoration:none; border-radius:8px; font-weight:800; text-align:center;">Cancel</a>
+        <div class="ops-actions" style="margin-top: 1.75rem;">
+            <button type="submit" class="btn btn-success">Create Lecturer</button>
+            <a href="{{ route('lecturers.index') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>

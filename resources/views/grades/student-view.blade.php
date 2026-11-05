@@ -1,14 +1,15 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
-    <div style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
+<div class="container academic-records">
+    <div class="records-header">
         <h1 style="margin: 0 0 0.5rem 0;">My Grades</h1>
         <p style="margin: 0; color: #666;">View your academic performance and GPA</p>
     </div>
 
     <!-- Stats Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="records-stats">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Total Courses</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">{{ $stats['total'] }}</h2>
@@ -37,7 +38,7 @@
 
     @if($grades->count() > 0)
     <!-- Performance Insights -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="records-insights">
         <!-- At Risk Alert -->
         @if($atRiskCourses->count() > 0)
         <div style="padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 0.25rem;">
@@ -79,7 +80,7 @@
     </div>
 
     <!-- Grade Distribution -->
-    <div class="card" style="margin-bottom: 2rem;">
+    <div class="records-surface" style="margin-bottom: 2rem;">
         <h3 style="margin: 0 0 1rem 0;">Grade Distribution</h3>
         <div style="display: flex; gap: 1rem; align-items: end; height: 200px;">
             @foreach($gradeDistribution as $letter => $count)
@@ -99,9 +100,9 @@
     </div>
 
     <!-- Grades Table -->
-    <div class="card">
+    <div class="records-surface">
         <h3 style="margin: 0 0 1.5rem 0;">Detailed Grade Report</h3>
-        <div style="overflow-x: auto;">
+        <div class="records-table" tabindex="0" role="region" aria-label="Detailed grade report">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 2px solid #ddd; background: #f8f9fa;">
@@ -127,7 +128,7 @@
                         <td style="padding: 1rem; text-align: center;">{{ $grade->assignment_score ?? '-' }}</td>
                         <td style="padding: 1rem; text-align: center; font-weight: 600;">{{ $grade->overall_score }}%</td>
                         <td style="padding: 1rem; text-align: center;">
-                            <span style="padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 600; font-size: 1.125rem;
+                            <span class="grade-badge grade-{{ strtolower($grade->grade ?? '') }}" style="padding: 0.5rem 1rem; border-radius: 0.25rem; font-weight: 600; font-size: 1.125rem;
                                 background-color: {{ in_array($grade->grade, ['A', 'B']) ? '#d4edda' : (in_array($grade->grade, ['C']) ? '#fff3cd' : '#f8d7da') }};
                                 color: {{ in_array($grade->grade, ['A', 'B']) ? '#155724' : (in_array($grade->grade, ['C']) ? '#856404' : '#721c24') }};">
                                 {{ $grade->grade }}
@@ -135,9 +136,9 @@
                         </td>
                         <td style="padding: 1rem; text-align: center;">
                             @if($grade->overall_score >= 50)
-                                <span style="color: #27ae60; font-weight: 600;">✓ Pass</span>
+                                <span class="status-badge present" style="color: #27ae60; font-weight: 600;">✓ Pass</span>
                             @else
-                                <span style="color: #e74c3c; font-weight: 600;">✗ Fail</span>
+                                <span class="status-badge absent" style="color: #e74c3c; font-weight: 600;">✗ Fail</span>
                             @endif
                         </td>
                     </tr>

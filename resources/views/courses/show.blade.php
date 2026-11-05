@@ -1,21 +1,22 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="max-width: 800px; margin: 30px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management academic-form-page">
+    <div class="academic-header">
         <h2>{{ $course->course_name }}</h2>
-        <div style="display: flex; gap: 10px;">
+        <div class="academic-actions">
             <a href="{{ route('courses.edit', $course) }}" class="btn-primary" style="padding: 10px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 4px;">Edit</a>
             <form action="{{ route('courses.destroy', $course) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn-danger" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                <button type="submit" class="btn-danger academic-danger" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
             </form>
         </div>
     </div>
 
-    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="academic-surface" style="margin-bottom: 24px;">
+        <div class="academic-grid academic-details">
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Course Code</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $course->course_code }}</p>
@@ -39,8 +40,8 @@
                 @endif
             </div>
             <div>
-                <h4 style="color: #34495e; margin-bottom: 10px;">Semester</h4>
-                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">Semester {{ $course->semester }}</p>
+                <h4 style="color: #34495e; margin-bottom: 10px;">Term</h4>
+                <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $course->term ? 'Term ' . $course->term : 'N/A' }}</p>
             </div>
         </div>
 
@@ -50,6 +51,6 @@
         </div>
     </div>
 
-    <a href="{{ route('courses.index') }}" class="btn-secondary" style="padding: 10px 15px; background: #95a5a6; color: white; text-decoration: none; border-radius: 4px;">Back to Courses</a>
+    <a href="{{ route('courses.index') }}" class="btn-secondary academic-secondary" style="padding: 10px 15px; background: #95a5a6; color: white; text-decoration: none; border-radius: 4px;">Back to Courses</a>
 </div>
 @endsection

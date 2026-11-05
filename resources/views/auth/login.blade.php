@@ -165,8 +165,9 @@
             font-family: monospace;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/authentication.css') }}?v={{ filemtime(public_path('css/authentication.css')) }}">
 </head>
-<body>
+<body class="authentication">
     <div class="login-container">
         <div class="login-header">
             <div class="login-logo">

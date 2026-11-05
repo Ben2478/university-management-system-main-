@@ -8,6 +8,7 @@ use App\Models\Receipt;
 use App\Models\Enrollment;
 use App\Models\Grade;
 use App\Models\User;
+use App\Models\AcademicCalendar;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -56,8 +57,17 @@ class DashboardController extends Controller
     private function superAdminDashboard()
     {
         // Get time period filter (default: all time)
-        $period = request('period', 'all');
-        $dateFrom = $this->getDateFromPeriod($period);
+        request()->validate(['period' => 'nullable|in:all,today,week,month,semester,year']);
+        $period = request('period') ?: 'all';
+        $range = $this->getDashboardPeriod($period);
+        $periodNotice = $range['notice'];
+        $filterTransactions = function ($query) use ($range) {
+            if ($range['missing']) {
+                $query->whereRaw('1 = 0');
+            } elseif ($range['start']) {
+                $query->whereBetween('created_at', [$range['start'], $range['end']]);
+            }
+        };
 
         // Enhanced stats with time filtering
         $stats = [
@@ -69,21 +79,15 @@ class DashboardController extends Controller
             'active_users' => User::whereNull('deleted_at')->count(),
             'recent_registrations' => User::where('created_at', '>=', now()->subDays(30))->count(),
             
-            'total_revenue' => Payment::when($dateFrom, function($q) use ($dateFrom) {
-                $q->where('created_at', '>=', $dateFrom);
-            })->sum('amount'),
+            'total_revenue' => Payment::where('status', 'completed')->where($filterTransactions)->sum('amount'),
             'completed_payments' => Payment::where('status', 'completed')
-                ->when($dateFrom, function($q) use ($dateFrom) {
-                    $q->where('created_at', '>=', $dateFrom);
-                })->count(),
+                ->where($filterTransactions)->count(),
             'pending_payments' => Payment::where('status', 'pending')->count(),
             
             'pending_receipts' => Receipt::where('status', 'pending')->count(),
             'pending_receipts_amount' => Receipt::where('status', 'pending')->sum('amount'),
             'approved_receipts' => Receipt::where('status', 'approved')
-                ->when($dateFrom, function($q) use ($dateFrom) {
-                    $q->where('created_at', '>=', $dateFrom);
-                })->count(),
+                ->where($filterTransactions)->count(),
             'rejected_receipts' => Receipt::where('status', 'rejected')->count(),
             
             'total_enrollments' => Enrollment::count(),
@@ -98,18 +102,14 @@ class DashboardController extends Controller
 
         // Recent payments with filtering
         $recent_payments = Payment::with('student')
-            ->when($dateFrom, function($q) use ($dateFrom) {
-                $q->where('created_at', '>=', $dateFrom);
-            })
+            ->where($filterTransactions)
             ->latest()
             ->limit(10)
             ->get();
 
         // Recent receipts with filtering
         $recent_receipts = Receipt::with('student')
-            ->when($dateFrom, function($q) use ($dateFrom) {
-                $q->where('created_at', '>=', $dateFrom);
-            })
+            ->where($filterTransactions)
             ->latest()
             ->limit(10)
             ->get();
@@ -137,21 +137,40 @@ class DashboardController extends Controller
             'enrollment_by_program',
             'alerts',
             'recent_activity',
-            'period'
+            'period',
+            'periodNotice'
         ));
     }
 
     // Helper method to get date from period
-    private function getDateFromPeriod($period)
+    private function getDashboardPeriod(string $period): array
     {
-        return match($period) {
+        $end = now();
+        if ($period === 'semester') {
+            $calendar = AcademicCalendar::whereDate('semester_start_date', '<=', today())
+                ->whereDate('semester_end_date', '>=', today())
+                ->orderByDesc('semester_start_date')->first();
+
+            return [
+                'start' => $calendar?->semester_start_date?->copy()->startOfDay(),
+                'end' => $end,
+                'missing' => !$calendar,
+                'notice' => $calendar
+                    ? $calendar->academic_year . ' / Semester ' . $calendar->semester . ': ' . $calendar->semester_start_date->format('d M Y') . ' to today'
+                    : 'No current semester is configured. Filtered transaction results are empty.',
+            ];
+        }
+
+        $start = match($period) {
             'today' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),
-            'semester' => now()->subMonths(6),
             'year' => now()->startOfYear(),
-            default => null, // all time
+            default => null,
         };
+
+        return ['start' => $start, 'end' => $end, 'missing' => false,
+            'notice' => $start ? $start->format('d M Y') . ' to today' : 'All-time transactions'];
     }
 
     // Get payment trend for last 12 months

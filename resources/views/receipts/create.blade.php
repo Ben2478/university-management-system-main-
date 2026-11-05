@@ -1,14 +1,15 @@
 @extends('layouts.student')
 
 @section('content')
-<div class="container" style="padding: 2rem 0;">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container finance-management" style="padding: 2rem 0;">
     <div style="margin-bottom: 2rem;">
         <h1 style="margin: 0 0 0.5rem 0;">Upload Payment Receipt</h1>
         <p style="margin: 0; color: #666;">Submit proof of payment for verification</p>
     </div>
 
     <!-- Payment Summary Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div class="finance-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div class="card" style="border-left: 4px solid #3498db; padding: 1.25rem;">
             <p style="margin: 0; color: #666; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Total Tuition Fee</p>
             <h2 style="margin: 0.5rem 0 0 0; color: #3498db; font-size: 2rem;">K{{ number_format($student->tuition_fee, 2) }}</h2>
@@ -41,7 +42,7 @@
         <form action="{{ route('receipts.store', $student) }}" method="POST" enctype="multipart/form-data" id="receiptForm">
             @csrf
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="finance-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                 <div>
                     <label for="amount" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Amount Paid (K) <span style="color: #e74c3c;">*</span></label>
                     <input type="number" id="amount" name="amount" step="0.01" min="0.01" max="{{ $balance }}" required placeholder="0.00" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;" value="{{ old('amount') }}">
@@ -69,7 +70,7 @@
 
             <div style="margin-bottom: 1.5rem;">
                 <label for="receipt_file" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Receipt File <span style="color: #e74c3c;">*</span></label>
-                <div style="border: 2px dashed #ddd; border-radius: 0.5rem; padding: 2rem; text-align: center; background: #f8f9fa;">
+                <div class="finance-upload" style="border: 2px dashed #ddd; border-radius: 0.5rem; padding: 2rem; text-align: center; background: #f8f9fa;">
                     <input type="file" id="receipt_file" name="receipt_file" accept=".pdf,.jpg,.jpeg,.png" required style="display: none;" onchange="displayFileName(this)">
                     <label for="receipt_file" style="cursor: pointer; display: block;">
                         <div style="font-size: 3rem; color: #3498db; margin-bottom: 0.5rem;">📎</div>
@@ -80,7 +81,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
+            <div class="finance-actions" style="display: flex; gap: 1rem;">
                 <button type="submit" style="flex: 1; padding: 1rem; background: #27ae60; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 1rem; font-weight: 600;">
                     ✓ Upload Receipt
                 </button>

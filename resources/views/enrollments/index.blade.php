@@ -248,8 +248,9 @@
             background: #7f8c8d;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/operations-management.css') }}?v={{ filemtime(public_path('css/operations-management.css')) }}">
 </head>
-<body>
+<body class="operations-management">
     <div class="container">
         <div class="header">
             <h1>Enrollments Management</h1>
@@ -331,7 +332,7 @@
             </div>
         @endif
 
-        <div class="table-container">
+        <div class="table-container" role="region" aria-label="Enrollments" tabindex="0">
             @if ($enrollments->count() > 0)
                 <table>
                     <thead>

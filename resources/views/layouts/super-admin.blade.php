@@ -58,42 +58,53 @@
             border: none;
             color: white;
             cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            transition: background 0.3s;
+            min-height: 42px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s ease;
         }
         .dropdown-toggle:hover { background: rgba(255,255,255,0.1); }
+        .dropdown-toggle:focus-visible, .nav-toggle:focus-visible, .sidebar a:focus-visible, .sidebar-header:focus-visible {
+            outline: 3px solid #f9c74f;
+            outline-offset: 2px;
+        }
         .dropdown-menu {
             display: none;
             position: absolute;
             right: 0;
-            top: 100%;
+            top: calc(100% + 0.5rem);
             background: white;
             color: #333;
-            min-width: 200px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 0.25rem;
+            min-width: 220px;
+            padding: 0.35rem;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
             z-index: 1000;
         }
-        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown.open .dropdown-menu { display: block; }
         .dropdown-menu a {
             display: block;
-            padding: 0.75rem 1rem;
+            padding: 0.7rem 0.8rem;
             text-decoration: none;
             color: #333;
-            border-bottom: 1px solid #eee;
+            border-radius: 0.35rem;
         }
-        .dropdown-menu a:hover { background: #f5f7fa; }
+        .dropdown-menu a:hover, .dropdown-menu a:focus-visible { background: #f5f7fa; }
+        select:not([multiple]) { min-height: 42px; padding: 0.6rem 2.4rem 0.6rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.4rem; background-color: #fff; color: #24313d; }
+        select:focus-visible { outline: 3px solid rgba(52,152,219,0.25); border-color: #2874a6; }
         .wrapper {
             display: flex;
             min-height: calc(100vh - 70px);
         }
         .sidebar {
             width: 260px;
+            flex: 0 0 260px;
             background: #34495e;
             color: white;
-            padding: 2rem 0;
+            padding: 1.25rem 0;
             overflow-y: auto;
+            overscroll-behavior: contain;
             border-right: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 8px 30px rgba(0,0,0,0.18);
         }
@@ -109,18 +120,26 @@
             margin-bottom: 0.5rem;
         }
         .sidebar-header {
+            width: calc(100% - 1.3rem);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.875rem 1.5rem;
+            min-height: 44px;
+            margin: 0 0.65rem;
+            padding: 0.7rem 0.85rem;
             color: #ecf0f1;
+            background: transparent;
+            border: 0;
+            border-radius: 0.4rem;
             cursor: pointer;
-            transition: all 0.3s;
+            text-align: left;
+            font: inherit;
+            transition: background 0.18s ease;
             font-weight: 500;
             user-select: none;
         }
         .sidebar-header:hover {
-            background: rgba(52, 152, 219, 0.1);
+            background: rgba(255,255,255,0.1);
         }
         .sidebar-header .icon {
             font-size: 1.1rem;
@@ -143,22 +162,24 @@
         }
         .sidebar a {
             display: block;
-            padding: 0.75rem 1.5rem;
-            color: #ecf0f1;
+            min-height: 44px;
+            padding: 0.7rem 1rem;
+            color: #fff;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: background 0.18s ease, color 0.18s ease;
             border-left: 3px solid transparent;
-            border-radius: 0.5rem;
-            margin: 0.125rem 0.75rem;
+            border-radius: 0.4rem;
+            margin: 0.15rem 0.65rem;
         }
         .sidebar a:hover {
             background: rgba(255,255,255,0.1);
-            border-left-color: #3498db;
+            border-left-color: #f9c74f;
         }
         .sidebar a.active {
-            background: rgba(52, 152, 219, 0.2);
-            border-left-color: #3498db;
-            color: #3498db;
+            background: rgba(255,255,255,0.18);
+            border-left-color: #f9c74f;
+            color: #fff;
+            font-weight: 700;
         }
         @media (max-width: 980px) {
             .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
@@ -231,104 +252,19 @@
         h1 { color: #2c3e50; }
         h2 { color: #34495e; }
         h3 { color: #34495e; }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
     </style>
+    @include('components.ui-foundation')
 </head>
 <body>
-    <div class="navbar">
-        <button class="nav-toggle" type="button" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
-        <h1>🎓 Student Management System - Super Admin</h1>
-        <div class="navbar-right">
-            <div class="user-info">
-                <span>{{ auth()->user()->name }}</span>
-                <div class="dropdown">
-                    <button class="dropdown-toggle">▼</button>
-                    <div class="dropdown-menu">
-                        <a href="{{ route('profile.edit') }}">Profile</a>
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-    </div>
+    @include('components.global-header', ['hasSidebar' => true])
 
     <div class="sidebar-overlay" onclick="closeSidebar()"></div>
 
-    <div class="wrapper">
-        <aside class="sidebar" id="sidebar">
-            <!-- Dashboard -->
-            <div class="sidebar-section">
-                <a href="{{ route('dashboard') }}" style="padding-left: 1.5rem;">
-                    <span style="margin-right: 0.5rem;">📊</span> Dashboard
-                </a>
-            </div>
+    <div class="wrapper phoenix-app-shell">
+        @include('components.sidebar')
 
-            <!-- Academic Management -->
-            <div class="sidebar-section">
-                <div class="sidebar-header" onclick="toggleSection('academic')">
-                    <span><span class="icon">👥</span> Academic Management</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div id="academic" class="sidebar-items">
-                    <a href="{{ route('programs.index') }}" style="padding-left: 3rem;">Programs</a>
-                    <a href="{{ route('students.index') }}" style="padding-left: 3rem;">Students</a>
-                    <a href="{{ route('lecturers.index') }}" style="padding-left: 3rem;">Lecturers</a>
-                    <a href="{{ route('courses.index') }}" style="padding-left: 3rem;">Courses</a>
-                    <a href="{{ route('enrollments.index') }}" style="padding-left: 3rem;">Enrollments</a>
-                </div>
-            </div>
-
-            <!-- Academic Records -->
-            <div class="sidebar-section">
-                <div class="sidebar-header" onclick="toggleSection('records')">
-                    <span><span class="icon">📚</span> Academic Records</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div id="records" class="sidebar-items">
-                    <a href="{{ route('grades.index') }}" style="padding-left: 3rem;">Grades</a>
-                    <a href="{{ route('attendance.index') }}" style="padding-left: 3rem;">Attendance</a>
-                </div>
-            </div>
-
-            <!-- Financial -->
-            <div class="sidebar-section">
-                <div class="sidebar-header" onclick="toggleSection('financial')">
-                    <span><span class="icon">💰</span> Financial</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div id="financial" class="sidebar-items">
-                    <a href="{{ route('payments.index') }}" style="padding-left: 3rem;">Payments</a>
-                    <a href="{{ route('receipts.index') }}" style="padding-left: 3rem;">Receipts</a>
-                </div>
-            </div>
-
-            <!-- Administration -->
-            <div class="sidebar-section">
-                <div class="sidebar-header" onclick="toggleSection('admin')">
-                    <span><span class="icon">🔐</span> Administration</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div id="admin" class="sidebar-items">
-                    <a href="{{ route('users.index') }}" style="padding-left: 3rem;">User Management</a>
-                </div>
-            </div>
-
-            <!-- Account -->
-            <div class="sidebar-section">
-                <div class="sidebar-header" onclick="toggleSection('account')">
-                    <span><span class="icon">👤</span> Account</span>
-                    <span class="arrow">▼</span>
-                </div>
-                <div id="account" class="sidebar-items">
-                    <a href="{{ route('profile.edit') }}" style="padding-left: 3rem;">Profile Settings</a>
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="padding-left: 3rem;">Logout</a>
-                </div>
-            </div>
-        </aside>
-
-        <main class="content">
+        <main class="content phoenix-app-content">
             @if($errors->any())
                 <div class="container">
                     <div class="alert alert-error">
@@ -355,78 +291,13 @@
     <script>
         function toggleSidebar() {
             document.body.classList.toggle('sidebar-open');
+            document.querySelector('.nav-toggle')?.setAttribute('aria-expanded', String(document.body.classList.contains('sidebar-open')));
         }
 
         function closeSidebar() {
             document.body.classList.remove('sidebar-open');
+            document.querySelector('.nav-toggle')?.setAttribute('aria-expanded', 'false');
         }
-
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const header = section.previousElementSibling;
-            
-            // Toggle open state
-            section.classList.toggle('open');
-            header.classList.toggle('active');
-            
-            // Save state to localStorage
-            const isOpen = section.classList.contains('open');
-            localStorage.setItem('sidebar_' + sectionId, isOpen ? 'open' : 'closed');
-        }
-        
-        // Restore saved states on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const sections = ['academic', 'records', 'financial', 'admin', 'account'];
-            
-            sections.forEach(sectionId => {
-                const savedState = localStorage.getItem('sidebar_' + sectionId);
-                const section = document.getElementById(sectionId);
-                const header = section.previousElementSibling;
-                
-                // Default: open all sections if no saved state
-                if (savedState === 'open' || savedState === null) {
-                    section.classList.add('open');
-                    header.classList.add('active');
-                }
-            });
-
-            // Active link highlighting
-            const currentPath = window.location.pathname.replace(/\/+$/, '');
-            const links = document.querySelectorAll('#sidebar a[href]');
-            let bestMatch = null;
-            let bestLength = -1;
-
-            links.forEach((link) => {
-                try {
-                    const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/+$/, '');
-                    if (linkPath === '' || linkPath === '/') {
-                        if (currentPath === '/' && linkPath.length > bestLength) {
-                            bestMatch = link;
-                            bestLength = linkPath.length;
-                        }
-                        return;
-                    }
-
-                    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
-                        if (linkPath.length > bestLength) {
-                            bestMatch = link;
-                            bestLength = linkPath.length;
-                        }
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            });
-
-            if (bestMatch) {
-                bestMatch.classList.add('active');
-                const parentItems = bestMatch.closest('.sidebar-items');
-                if (parentItems && !parentItems.classList.contains('open')) {
-                    parentItems.classList.add('open');
-                    parentItems.previousElementSibling?.classList.add('active');
-                }
-            }
-        });
     </script>
 </body>
 </html>

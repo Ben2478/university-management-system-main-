@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<link rel="stylesheet" href="{{ asset('css/finance-management.css') }}?v={{ filemtime(public_path('css/finance-management.css')) }}">
+<div class="container mx-auto px-4 py-8 finance-management">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">New Payment</h1>
         <p class="text-gray-600 mt-2">for {{ $student->first_name }} {{ $student->last_name }}</p>
@@ -17,7 +18,7 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow p-8 max-w-md">
+    <div class="finance-panel finance-form-panel bg-white rounded-lg shadow p-8 max-w-md">
         <form action="{{ route('payments.store', $student) }}" method="POST">
             @csrf
 
@@ -49,7 +50,7 @@
                 @enderror
             </div>
 
-            <div class="flex gap-4">
+            <div class="finance-actions flex gap-4">
                 <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700">
                     Proceed to Payment
                 </button>

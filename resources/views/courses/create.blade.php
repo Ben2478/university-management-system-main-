@@ -1,8 +1,9 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : 'layouts.app'))
 
 @section('content')
-<div class="container" style="max-width: 800px; margin: 30px auto; padding: 0 20px;">
-    <div style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="{{ asset('css/academic-management.css') }}">
+<div class="container academic-management academic-form-page">
+    <div class="academic-header">
         <h1 style="margin: 0 0 0.5rem 0;">Add New Course</h1>
         <p style="margin: 0; color: #666;">Create a new course and assign it to a program</p>
     </div>
@@ -18,10 +19,10 @@
         </div>
     @endif
 
-    <form action="{{ route('courses.store') }}" method="POST" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <form action="{{ route('courses.store') }}" method="POST" class="academic-surface">
         @csrf
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <div class="academic-grid">
             <!-- Course Code -->
             <div>
                 <label for="course_code" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Course Code <span style="color: #e74c3c;">*</span></label>
@@ -42,13 +43,13 @@
                 <small style="color: #666; font-size: 0.875rem;">Number of credit hours (1-6)</small>
             </div>
 
-            <!-- Semester -->
+            <!-- Term -->
             <div>
-                <label for="semester" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Semester <span style="color: #e74c3c;">*</span></label>
-                <select id="semester" name="semester" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; background: white;">
-                    <option value="">Select Semester</option>
-                    @for($i = 1; $i <= 8; $i++)
-                        <option value="{{ $i }}" {{ old('semester') == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
+                <label for="term" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Term <span style="color: #e74c3c;">*</span></label>
+                <select id="term" name="term" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; background: white;">
+                    <option value="">Select Term</option>
+                    @for($i = 1; $i <= 3; $i++)
+                        <option value="{{ $i }}" {{ old('term') == $i ? 'selected' : '' }}>Term {{ $i }}</option>
                     @endfor
                 </select>
             </div>
@@ -77,11 +78,21 @@
             <!-- Instructor -->
             <div>
                 <label for="instructor" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Instructor</label>
-                <input type="text" id="instructor" name="instructor" placeholder="e.g., Dr. John Smith" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" value="{{ old('instructor') }}">
+                <select id="instructor" name="instructor" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; background: white;">
+                    <option value="">Select an instructor</option>
+                    @foreach(($lecturers ?? []) as $lecturer)
+                        <option value="{{ $lecturer->full_name }}" {{ old('instructor') === $lecturer->full_name ? 'selected' : '' }}>
+                            {{ $lecturer->full_name }} ({{ $lecturer->lecturer_code }})
+                        </option>
+                    @endforeach
+                </select>
+                @if(($lecturers ?? collect())->isEmpty())
+                    <small style="color: #666;">Add an active lecturer before assigning an instructor.</small>
+                @endif
             </div>
 
             <!-- Lecturers (Multi) -->
-            <div style="grid-column: span 2;">
+            <div class="academic-wide">
                 <label for="lecturer_ids" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50;">Assign Lecturers</label>
                 <select id="lecturer_ids" name="lecturer_ids[]" multiple style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; background: white; min-height: 120px;">
                     @foreach(($lecturers ?? []) as $lecturer)
@@ -107,11 +118,11 @@
         </div>
 
         <!-- Buttons -->
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <div class="academic-actions academic-form-actions">
             <button type="submit" style="flex: 1; padding: 0.875rem; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: 600;">
                 ✓ Create Course
             </button>
-            <a href="{{ route('courses.index') }}" style="flex: 1; padding: 0.875rem; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
+            <a href="{{ route('courses.index') }}" class="academic-secondary" style="flex: 1; padding: 0.875rem; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; text-align: center; font-size: 1rem; font-weight: 600; display: block;">
                 × Cancel
             </a>
         </div>

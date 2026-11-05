@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StudentLoginDetails;
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Throwable;
 
 class StudentController extends Controller
 {
@@ -172,7 +178,9 @@ class StudentController extends Controller
     public function create()
     {
         $schools = config('schools.labels', []);
-        return view('students.create', compact('schools'));
+        $programs = Program::where('status', 'active')->orderBy('name')->pluck('name');
+
+        return view('students.create', compact('schools', 'programs'));
     }
 
     // Store student
@@ -200,12 +208,18 @@ class StudentController extends Controller
             'state' => 'nullable|string',
             'postal_code' => 'nullable|string',
             'enrollment_date' => 'required|date',
-            'program' => 'required|string|max:255',
-            'year' => 'required|integer|min:1|max:5',
-            'semester' => 'required|integer|min:1|max:2',
+            'program' => ['required', 'string', 'max:255', Rule::exists('programs', 'name')->where('status', 'active')],
+            'student_type' => 'required|in:regular,short_course',
+            'year' => 'required_if:student_type,regular|nullable|integer|min:1|max:5',
+            'semester' => 'required_if:student_type,regular|nullable|integer|min:1|max:2',
             'tuition_fee' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive,graduated,suspended',
         ]);
+
+        if ($validated['student_type'] === 'short_course') {
+            $validated['year'] = 1;
+            $validated['semester'] = 1;
+        }
 
         // Generate student ID: YYYY + school_code + last3digits(NRC before first '/')
         $year = (string) date('Y', strtotime($validated['enrollment_date']));
@@ -246,9 +260,26 @@ class StudentController extends Controller
         $validated['user_id'] = $user->id;
         $student = Student::create($validated);
 
+        try {
+            Mail::to($student->email)->send(new StudentLoginDetails($student, $password));
+
+            $emailStatus = config('mail.default') === 'log'
+                ? 'Login details were written to the application mail log. Configure SMTP to deliver them to the student.'
+                : "Login details were emailed to {$student->email}.";
+        } catch (Throwable $exception) {
+            Log::error('Student login details email could not be sent.', [
+                'student_id' => $student->student_id,
+                'email' => $student->email,
+                'exception' => $exception->getMessage(),
+            ]);
+
+            $emailStatus = 'The student was created, but the login email could not be sent. Please share the credentials manually.';
+        }
+
         // Store credentials in session to display them
         return redirect()->route('students.show', $student)->with([
             'success' => 'Student created successfully',
+            'login_email_status' => $emailStatus,
             'login_credentials' => [
                 'email' => $validated['email'],
                 'password' => $password,
@@ -266,7 +297,12 @@ class StudentController extends Controller
     // Show edit form
     public function edit(Student $student)
     {
-        return view('students.edit', compact('student'));
+        $programs = Program::where('status', 'active')
+            ->orWhere('name', $student->program)
+            ->orderBy('name')
+            ->pluck('name');
+
+        return view('students.edit', compact('student', 'programs'));
     }
 
     // Update student
@@ -284,7 +320,14 @@ class StudentController extends Controller
             'city' => 'nullable|string',
             'state' => 'nullable|string',
             'postal_code' => 'nullable|string',
-            'program' => 'required|string|max:255',
+            'program' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::exists('programs', 'name')->where(function ($query) use ($student) {
+                    $query->where('status', 'active')->orWhere('name', $student->program);
+                }),
+            ],
             'status' => 'required|in:active,inactive,graduated,suspended',
         ]);
 

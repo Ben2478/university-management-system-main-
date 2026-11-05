@@ -1,11 +1,12 @@
 @extends(auth()->user()->role === 'super_admin' ? 'layouts.super-admin' : (auth()->user()->role === 'admin' ? 'layouts.admin' : (auth()->user()->role === 'lecturer' ? 'layouts.lecturer' : 'layouts.app')))
 
 @section('content')
-<div class="container" style="max-width: 800px; margin: 30px auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+<link rel="stylesheet" href="{{ asset('css/academic-records.css') }}?v={{ filemtime(public_path('css/academic-records.css')) }}">
+<div class="container academic-records records-detail-page">
+    <div class="records-header">
         <h2>Grade Record</h2>
         @if(!auth()->user()->isStudent() && !auth()->user()->isParent())
-            <div style="display: flex; gap: 10px;">
+            <div class="records-actions">
                 <a href="{{ route('grades.edit', $grade) }}" class="btn-primary" style="padding: 10px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 4px;">Edit</a>
                 <form action="{{ route('grades.destroy', $grade) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure?');">
                     @csrf
@@ -16,8 +17,8 @@
         @endif
     </div>
 
-    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="records-surface">
+        <div class="records-grid">
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Student</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #2c3e50;">{{ $grade->student->user->name }}</p>
@@ -45,7 +46,7 @@
             <div>
                 <h4 style="color: #34495e; margin-bottom: 10px;">Grade</h4>
                 <p style="font-size: 18px; font-weight: bold; color: #f39c12;">
-                    <span style="padding: 5px 10px; background: #f39c12; color: white; border-radius: 4px;">{{ $grade->grade ?? '-' }}</span>
+                    <span class="grade-badge grade-{{ strtolower($grade->grade ?? '') }}">{{ $grade->grade ?? '-' }}</span>
                 </p>
             </div>
             <div>

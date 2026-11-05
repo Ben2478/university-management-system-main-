@@ -1,0 +1,215 @@
+.operations-management {
+    --ops-ink: #172b4d;
+    --ops-muted: #52627a;
+    --ops-violet: #6554c0;
+    --ops-teal: #087f82;
+    --ops-blue: #2264b5;
+    --ops-border: #dce3ed;
+    color: var(--ops-ink);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.operations-management *,
+.operations-management *::before,
+.operations-management *::after {
+    box-sizing: border-box;
+    min-width: 0;
+    letter-spacing: 0;
+}
+
+body.operations-management {
+    background: #f4f6fa;
+    padding: 24px;
+}
+
+.operations-management.container,
+.operations-management .container {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+}
+
+.operations-management :is(h1, h2, h3, h4) {
+    color: var(--ops-ink) !important;
+    line-height: 1.3;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.operations-management h1 { font-size: 1.65rem; }
+.operations-management h2 { font-size: 1.3rem; }
+.operations-management h3 { font-size: 1.05rem; }
+.operations-management h4 { font-size: 1rem; }
+.operations-management p { margin-block: 0.6rem; }
+.operations-management :is(small, .text-muted, .subtitle) { color: var(--ops-muted); }
+.operations-management a:not(.btn):not([class^="btn-"]) { color: var(--ops-blue); }
+
+.operations-management :is(.header, .page-header, .ops-header) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 0 0 20px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--ops-border);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.operations-management :is(.card, .form-container, .filter-section, .table-container, .stat-card) {
+    border: 1px solid var(--ops-border);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: none;
+}
+
+.operations-management :is(.card, .form-container, .filter-section) { padding: 24px; }
+.operations-management .card .card { border: 0; padding: 0; }
+.operations-management :is(.stats-grid, .ops-stats) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.operations-management .stat-card { padding: 20px; border-left: 3px solid var(--ops-violet); }
+.operations-management .stat-card.active { border-left-color: var(--ops-teal); }
+.operations-management .stat-card.completed { border-left-color: var(--ops-blue); }
+.operations-management .stat-card.dropped { border-left-color: #b9384e; }
+.operations-management .stat-card h3 { color: var(--ops-muted) !important; font-size: 0.85rem; }
+.operations-management .stat-card .number { color: var(--ops-ink); font-size: 1.8rem; }
+
+.operations-management :is(.form-grid, .form-row, .ops-grid) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+.operations-management .filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    gap: 16px;
+    align-items: end;
+}
+.operations-management :is(.form-group, .filter-group) { min-width: 0; margin-bottom: 18px; }
+.operations-management label { display: block; color: var(--ops-ink); font-size: 0.875rem; font-weight: 600; margin-bottom: 6px; }
+.operations-management :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #b9c5d5;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ops-ink);
+    font: inherit;
+    line-height: 1.5;
+}
+.operations-management :is(input, select, textarea):focus {
+    outline: 2px solid var(--ops-violet);
+    outline-offset: 2px;
+    border-color: var(--ops-violet) !important;
+    box-shadow: 0 0 0 3px #6554c018;
+}
+.operations-management :is(input, select, textarea):disabled { background: #edf1f6; color: var(--ops-muted); cursor: not-allowed; }
+.operations-management :is(input[type="checkbox"], input[type="radio"]) { width: auto; accent-color: var(--ops-violet); }
+.operations-management textarea { resize: vertical; }
+
+.operations-management :is(.btn, button, .btn-filter, .btn-reset),
+.operations-management .action-buttons :where(a) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    max-width: 100%;
+    padding: 9px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px !important;
+    background: var(--ops-violet) !important;
+    color: #fff !important;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal !important;
+    cursor: pointer;
+    transition: filter 150ms ease;
+}
+.operations-management :is(.btn-primary, .btn-info, button.bg-blue-600) { background: var(--ops-blue) !important; }
+.operations-management :is(.btn-success, button.bg-green-600) { background: var(--ops-teal) !important; }
+.operations-management :is(.btn-secondary, .btn-reset, button.bg-gray-200) { background: #e9edf4 !important; color: var(--ops-ink) !important; border-color: #cbd5e2; }
+.operations-management .btn-warning { background: #fff0c2 !important; color: #684500 !important; border-color: #e6c97b; }
+.operations-management :is(.btn-danger, button.bg-red-600) { background: #b9384e !important; color: #fff !important; }
+.operations-management :is(.btn, button, .btn-filter, .btn-reset):hover { filter: brightness(0.94); }
+.operations-management :is(a, button):focus-visible { outline: 2px solid var(--ops-blue); outline-offset: 3px; }
+.operations-management :is(.action-buttons, .filter-actions, .form-actions, .ops-actions, .ops-flex) { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.operations-management .action-buttons { min-width: 140px; }
+.operations-management .action-buttons :is(a, button) { font-size: 0.8rem; padding: 7px 10px; }
+.operations-management .action-buttons form { margin: 0; }
+
+.operations-management :is(.table-container, .table-responsive, .ops-table-scroll) {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+.operations-management table { width: 100%; min-width: 680px; border-collapse: collapse; font-size: 0.875rem; }
+.operations-management :is(th, td) { padding: 13px 16px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--ops-border); }
+.operations-management th { background: #edf1f8; color: var(--ops-ink); font-size: 0.8rem; font-weight: 650; white-space: nowrap; }
+.operations-management tbody tr:hover { background: #f6f8fc; }
+.operations-management :is(.badge, .status-badge, .role-badge) { display: inline-block; padding: 4px 9px; border-radius: 4px; font-size: 0.78rem; font-weight: 600; }
+.operations-management .alert { padding: 14px 18px; border-radius: 6px; margin-bottom: 20px; }
+.operations-management .alert ul { padding-left: 20px; }
+.operations-management .alert-success { background: #e4f4ef; color: #086453; border: 1px solid #afd9cb; }
+.operations-management :is(.alert-error, .alert-danger) { background: #fcebef; color: #9c243b; border: 1px solid #efbcc7; }
+.operations-management .alert-info { background: #e9f2ff; color: #245694; border: 1px solid #bfd4f1; }
+.operations-management :is(.no-data, .empty-state) { padding: 40px 20px; text-align: center; color: var(--ops-muted); }
+.operations-management .pagination { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+.operations-management nav svg { width: 20px; height: 20px; }
+.operations-management .ops-page-title { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--ops-border); }
+.operations-management .ops-detail-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); gap: 24px; }
+.operations-management .ops-detail-grid > * { grid-column: auto; }
+.operations-management .ops-grid > [class~="md:col-span-2"] { grid-column: 1 / -1; }
+.operations-management .bg-white { background: #fff; border: 1px solid var(--ops-border); border-radius: 8px; box-shadow: none; }
+.operations-management :is(.p-6, .p-8) { padding: 24px; }
+.operations-management :is(.rounded-full, .role-badge) { border-radius: 4px; }
+.operations-management .w-full { width: 100%; }
+.operations-management .mt-4 { margin-top: 16px; }
+.operations-management .mt-6 { margin-top: 24px; }
+.operations-management .mb-4 { margin-bottom: 16px; }
+.operations-management .mb-6 { margin-bottom: 24px; }
+.operations-management .space-y-3 > * + * { margin-top: 12px; }
+.operations-management .space-y-4 > * + * { margin-top: 16px; }
+.operations-management .space-y-6 > * + * { margin-top: 24px; }
+.operations-management .my-6 { margin-block: 24px; border: 0; border-top: 1px solid var(--ops-border); }
+.operations-management :is(.bg-red-100, .bg-green-100, .bg-yellow-50) { padding: 12px 16px; border-radius: 6px; }
+.operations-management .bg-red-100 { background: #fcebef; color: #9c243b; }
+.operations-management .bg-green-100 { background: #e4f4ef; color: #086453; }
+.operations-management .bg-yellow-50 { background: #fff6db; color: #684500; }
+.operations-management .ops-table-actions { min-width: 210px; white-space: normal; }
+.operations-management .ops-table-actions > * { display: inline-block; margin: 4px 8px 4px 0; }
+.operations-management .ops-table-actions button { padding: 7px 10px; font-size: 0.8rem; }
+.operations-management.ops-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: #172b4d80; }
+.operations-management.ops-modal.hidden { display: none; }
+.operations-management.ops-modal > div { width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; margin: 0; padding: 24px; }
+
+@media (max-width: 700px) {
+    body.operations-management { padding: 16px; }
+    .operations-management :is(.card, .form-container, .filter-section) { padding: 16px; }
+    .operations-management :is(.form-grid, .form-row, .ops-grid) { grid-template-columns: minmax(0, 1fr) !important; }
+    .operations-management :is(.header, .page-header, .ops-header) { align-items: flex-start; }
+    .operations-management :is(.ops-actions, .form-actions) > * { flex: 1 1 140px; }
+    .operations-management .ops-detail-grid { grid-template-columns: minmax(0, 1fr); }
+    .operations-management h1 { font-size: 1.4rem; }
+}
